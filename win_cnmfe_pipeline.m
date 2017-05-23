@@ -6,8 +6,10 @@ global  d1 d2 numFrame ssub tsub sframe num2read Fs neuron neuron_ds ...
 %% select data and map it to the RAM
 % nam = '~/Dropbox/github/CNMF_E/demos/data_endoscope.tif';
 cnmfe_choose_data;
+% populates workspace with nam_mat
 
 %% create Source2D class object for storing results and parameters
+splitBy = 10;
 Fs = 30;             % frame rate
 ssub = 2;           % spatial downsampling factor
 tsub = 1;           % temporal downsampling factor
@@ -38,21 +40,36 @@ neuron_full.options.deconv_options = struct('type', 'ar1', ... % model of the ca
     'optimize_b', false, ... % optimize the baseline
     'optimize_smin', true);  % optimize the threshold
 
+tic;
 %% downsample data for fast and better initialization
-sframe=1;						% user input: first frame to read (optional, default:1)
-num2read= numFrame;             % user input: how many frames to read   (optional, default: until the end)
+num2read = ceil(numFrame/splitBy);             % user input: how many frames to read   (optional, default: until the end)
+reads = 1:num2read:numFrame+1;
+if reads(end) < numFrame
+  reads = [reads numFrame+1];
+end
+delta_reads = diff(reads)-1;
 
+% cnmfe_load_data;
 % sequentially load in the frames and run shit on it
 % for each rimage subset, run:
-tic;
-cnmfe_load_data;
-fprintf('Time cost in downsapling data:     %.2f seconds\n', toc);
+for i=1:length(reads)-1
+  fprintf('Running this on neuron subset: %d', i);
+  sframe = reads(i);
+  num2read = delta_reads(i);
 
-Y = neuron.reshape(Y, 1);       % convert a 3D video into a 2D matrix
+  [Y, neuron] = neuron_full.load_data(nam_mat, sframe, num2read);
+  [d1s, d2s, T] = size(Y);
+  fprintf('\nThe data has been downsampled and loaded into RAM. It has %d X %d pixels X %d frames. \nLoading all data requires %.2f GB RAM\n\n', d1s, d2s, T, d1s*d2s*T*8/(2^30));
+  fprintf('Time cost in downsapling data:     %.2f seconds\n', toc);
 
-%% compute correlation image and peak-to-noise ratio image.
-cnmfe_show_corr_pnr;    % this step is not necessary, but it can give you some...
-                        % hints on parameter selection, e.g., min_corr & min_pnr
+  Y = neuron.reshape(Y, 1);       % convert a 3D video into a 2D matrix
+
+  % if you want to look at the correlation image crap for parameter selection
+  % then look at this shitty plot and uncomment the 2 lines below
+  % cnmfe_show_corr_pnr;
+  % input('How did you like those fucking cells? ', 's');
+
+end
 
 %% initialization of A, C
 % parameters
