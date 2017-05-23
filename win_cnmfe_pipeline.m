@@ -69,28 +69,32 @@ for i=1:length(reads)-1
   % cnmfe_show_corr_pnr;
   % input('How did you like those fucking cells? ', 's');
 
+  %% initialization of A, C
+
+  % parameters
+  debug_on = false;   % visualize the initialization procedue.
+  save_avi = false;   %save the initialization procedure as an avi movie.
+
+  % I divide it because it crashes matlab otherwise (on mac)
+  patch_par = [1,1]*4; %1;  % divide the optical field into m X n patches and do initialization patch by patch. It can be used when the data is too large
+  K = []; % maximum number of neurons to search within each patch. you can use [] to search the number automatically
+
+  min_corr = 0.6;     % minimum local correlation for a seeding pixel
+  min_pnr = 9;       % minimum peak-to-noise ratio for a seeding pixel
+  min_pixel = 3;      % minimum number of nonzero pixels for each neuron
+  bd = 5;             % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
+  neuron.updateParams('min_corr', min_corr, 'min_pnr', min_pnr, ...
+      'min_pixel', min_pixel, 'bd', bd);
+  neuron.options.nk = 1;  % number of knots for detrending
+  
+  tic;
+  [center, Cn, pnr] = neuron.initComponents_endoscope(Y, K, patch_par, debug_on, save_avi);
+  fprintf('Time cost in initializing neurons:     %.2f seconds\n', toc);
 end
 
-%% initialization of A, C
-% parameters
-debug_on = false;   % visualize the initialization procedue.
-save_avi = false;   %save the initialization procedure as an avi movie.
-patch_par = [1,1]*4; %1;  % divide the optical field into m X n patches and do initialization patch by patch. It can be used when the data is too large
-% I have to divide it because it crashes matlab otherwise
-K = []; % maximum number of neurons to search within each patch. you can use [] to search the number automatically
 
-min_corr = 0.6;     % minimum local correlation for a seeding pixel
-min_pnr = 9;       % minimum peak-to-noise ratio for a seeding pixel
-min_pixel = 3;      % minimum number of nonzero pixels for each neuron
-bd = 5;             % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
-neuron.updateParams('min_corr', min_corr, 'min_pnr', min_pnr, ...
-    'min_pixel', min_pixel, 'bd', bd);
-neuron.options.nk = 1;  % number of knots for detrending
 
 % greedy method for initialization
-tic;
-[center, Cn, pnr] = neuron.initComponents_endoscope(Y, K, patch_par, debug_on, save_avi);
-fprintf('Time cost in initializing neurons:     %.2f seconds\n', toc);
 
 % show results
 figure;
