@@ -50,10 +50,10 @@ end
 delta_reads = diff(reads)-1;
 
 % cnmfe_load_data;
-% sequentially load in the frames and run shit on it
+%% sequentially load in the frames and run shit on it
 % for each rimage subset, run:
 for i=1:length(reads)-1
-  fprintf('Running this on neuron subset: %d', i);
+  fprintf('Running this on neuron subset: %d\n', i);
   sframe = reads(i);
   num2read = delta_reads(i);
 
@@ -113,10 +113,10 @@ for i=1:length(reads)-1
   view_neurons = false;           % view all neurons
 
   % parameters, estimate the background
-  spatial_ds_factor = 2;      % spatial downsampling factor. it's for faster estimation
+  spatial_ds_factor = 1;      % spatial downsampling factor. it's for faster estimation
   % spatial_ds_factor = 1;
   thresh = 9;     % threshold for detecting frames with large cellular activity. (mean of neighbors' activity  + thresh*sn)
-  
+
   % TODO: figure out what this means
   bg_neuron_ratio = 1;  % spatial range / diameter of neurons
 
@@ -128,7 +128,7 @@ for i=1:length(reads)-1
                       %2) update_spatial_method== 'nnls', it is the maximum
                       %number of neurons overlapping at one pixel
 
-  % parameters for running iteratiosn
+  % parameters for running iterations
   nC = size(neuron.C, 1);    % number of neurons
 
   maxIter = 2;        % maximum number of iterations
@@ -240,16 +240,17 @@ for i=1:length(reads)-1
   title('contours of estimated neurons');
 
   %% check spatial and temporal components by playing movies
-  save_avi = false;
-  avi_name = 'play_movie.avi';
-  neuron.Cn = Cn;
-  neuron.runMovie(Ysignal, [0, 50], save_avi, avi_name);
+  % for now I am going to forgo this
+  % save_avi = false;
+  % avi_name = 'play_movie.avi';
+  % neuron.Cn = Cn;
+  % neuron.runMovie(Ysignal, [0, 50], save_avi, avi_name);
 
-  %% save video
-  kt = 3;     % play one frame in every kt frames
-  save_avi = true;
-  center_ac = median(max(neuron.A,[],1)'.*max(neuron.C,[],2)); % the denoised video are mapped to [0, 2*center_ac] of the colormap
-  cnmfe_save_video;
+  %% save video - NOOOOOOO
+  % kt = 3;     % play one frame in every kt frames
+  % save_avi = true;
+  % center_ac = median(max(neuron.A,[],1)'.*max(neuron.C,[],2)); % the denoised video are mapped to [0, 2*center_ac] of the colormap
+  % cnmfe_save_video;
 
   %% save results
   globalVars = who('global');
