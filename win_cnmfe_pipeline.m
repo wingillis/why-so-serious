@@ -86,175 +86,172 @@ for i=1:length(reads)-1
   neuron.updateParams('min_corr', min_corr, 'min_pnr', min_pnr, ...
       'min_pixel', min_pixel, 'bd', bd);
   neuron.options.nk = 1;  % number of knots for detrending
-  
+
+  % greedy method for initialization
   tic;
   [center, Cn, pnr] = neuron.initComponents_endoscope(Y, K, patch_par, debug_on, save_avi);
   fprintf('Time cost in initializing neurons:     %.2f seconds\n', toc);
+
+  % show results
+  % figure;
+  % imagesc(Cn, [0.1, 0.95]);
+  % hold on; plot(center(:, 2), center(:, 1), 'or');
+  % colormap; axis off tight equal;
+
+  % sort neurons; why????? I have no idea 0_0
+  [~, srt] = sort(max(neuron.C, [], 2), 'descend');
+  neuron.orderROIs(srt);
+  neuron_init = neuron.copy();
+
+  %% iteratively update A, C and B
+  % parameters, merge neurons
+
+  % this part of the block is using an intense amount of ram, and is crashing
+  % matlab
+
+  display_merge = false;          % visually check the merged neurons
+  view_neurons = false;           % view all neurons
+
+  % parameters, estimate the background
+  spatial_ds_factor = 2;      % spatial downsampling factor. it's for faster estimation
+  % spatial_ds_factor = 1;
+  thresh = 9;     % threshold for detecting frames with large cellular activity. (mean of neighbors' activity  + thresh*sn)
+  
+  % TODO: figure out what this means
+  bg_neuron_ratio = 1;  % spatial range / diameter of neurons
+
+  % parameters, estimate the spatial components
+  update_spatial_method = 'hals';  % the method for updating spatial components {'hals', 'hals_thresh', 'nnls', 'lars'}
+  Nspatial = 5;       % this variable has different meanings:
+                      %1) udpate_spatial_method=='hals' or 'hals_thresh',
+                      %then Nspatial is the maximum iteration
+                      %2) update_spatial_method== 'nnls', it is the maximum
+                      %number of neurons overlapping at one pixel
+
+  % parameters for running iteratiosn
+  nC = size(neuron.C, 1);    % number of neurons
+
+  maxIter = 2;        % maximum number of iterations
+  miter = 1;
+  while miter <= maxIter
+      %% merge neurons, order neurons and delete some low quality neurons
+       if miter ==1
+          merge_thr = [1e-1, 0.8, .1];     % thresholds for merging neurons
+          % corresponding to {sptial overlaps, temporal correlation of C,
+          %temporal correlation of S}
+      else
+          merge_thr = [0.6, 0.5, 0.1];
+      end
+      % merge neurons
+      cnmfe_quick_merge;              % run neuron merges
+
+      %% udpate background (cell 1, the following three blocks can be run iteratively)
+      % estimate the background
+      tic;
+      cnmfe_update_BG;
+      fprintf('Time cost in estimating the background:        %.2f seconds\n', toc);
+      % neuron.playMovie(Ysignal); % play the video data after subtracting the background components.
+
+      %% update spatial & temporal components
+      tic;
+      for m=1:2
+          %temporal
+          neuron.updateTemporal_endoscope(Ysignal);
+          cnmfe_quick_merge;              % run neuron merges
+          %spatial
+          neuron.updateSpatial_endoscope(Ysignal, Nspatial, update_spatial_method);
+          neuron.trimSpatial(0.01, 3); % for each neuron, apply imopen first and then remove pixels that are not connected with the center
+          if isempty(merged_ROI)
+              break;
+          end
+      end
+      fprintf('Time cost in updating spatial & temporal components:     %.2f seconds\n', toc);
+
+      %% pick neurons from the residual (cell 4).
+      if miter==1
+          neuron.options.seed_method = 'auto'; % methods for selecting seed pixels {'auto', 'manual'}
+          [center_new, Cn_res, pnr_res] = neuron.pickNeurons(Ysignal - neuron.A*neuron.C, patch_par); % method can be either 'auto' or 'manual'
+      end
+
+      %% stop the iteration
+      temp = size(neuron.C, 1);
+      if or(nC==temp, miter==maxIter)
+          break;
+      else
+          miter = miter+1;
+          nC = temp;
+      end
+  end
+
+  %% apply results to the full resolution
+  if or(ssub>1, tsub>1)
+      neuron_ds = neuron.copy();  % save the result
+      neuron = neuron_full.copy();
+      cnmfe_full;
+      neuron_full = neuron.copy();
+  end
+
+
+  %% delete some neurons and run CNMF-E iteration
+  neuron.viewNeurons([], neuron.C_raw);
+  tic;
+  cnmfe_update_BG;
+  fprintf('Time cost in estimating the background:        %.2f seconds\n', toc);
+  %update spatial & temporal components
+  tic;
+  for m=1:2
+      %temporal
+      neuron.updateTemporal_endoscope(Ysignal);
+      cnmfe_quick_merge;              % run neuron merges
+      %spatial
+      neuron.updateSpatial_endoscope(Ysignal, Nspatial, update_spatial_method);
+      neuron.trimSpatial(0.01, 3); % for each neuron, apply imopen first and then remove pixels that are not connected with the center
+  end
+  fprintf('Time cost in updating spatial & temporal components:     %.2f seconds\n', toc);
+
+  %% display neurons
+  dir_neurons = sprintf('%s%s%s_neurons%s', dir_nm, filesep, file_nm, filesep);
+  if exist('dir_neurons', 'dir')
+      temp = cd();
+      cd(dir_neurons);
+      delete *;
+      cd(temp);
+  else
+      mkdir(dir_neurons);
+  end
+  neuron.viewNeurons([], neuron.C_raw, dir_neurons);
+  close(gcf);
+
+  %% display contours of the neurons
+  neuron.Coor = neuron.get_contours(0.8); % energy within the contour is 80% of the total
+  figure;
+  Cnn = correlation_image(neuron.reshape(Ysignal(:, 1:5:end), 2), 4);
+  neuron.Coor = plot_contours(neuron.A, Cnn, 0.8, 0, [], neuron.Coor, 2);
+  colormap winter;
+  axis equal; axis off;
+  title('contours of estimated neurons');
+
+  % plot contours with IDs
+  % [Cn, pnr] = neuron.correlation_pnr(Y(:, round(linspace(1, T, min(T, 1000)))));
+  figure;
+  Cn = imresize(Cn, [d1, d2]);
+  plot_contours(neuron.A, Cn, 0.8, 0, [], neuron.Coor, 2);
+  colormap winter;
+  title('contours of estimated neurons');
+
+  %% check spatial and temporal components by playing movies
+  save_avi = false;
+  avi_name = 'play_movie.avi';
+  neuron.Cn = Cn;
+  neuron.runMovie(Ysignal, [0, 50], save_avi, avi_name);
+
+  %% save video
+  kt = 3;     % play one frame in every kt frames
+  save_avi = true;
+  center_ac = median(max(neuron.A,[],1)'.*max(neuron.C,[],2)); % the denoised video are mapped to [0, 2*center_ac] of the colormap
+  cnmfe_save_video;
+
+  %% save results
+  globalVars = who('global');
+  eval(sprintf('save %s%s%s_results.mat %s', dir_nm, filesep, file_nm, strjoin(globalVars)));
 end
-
-
-
-% greedy method for initialization
-
-% show results
-figure;
-imagesc(Cn, [0.1, 0.95]);
-hold on; plot(center(:, 2), center(:, 1), 'or');
-colormap; axis off tight equal;
-
-% sort neurons
-[~, srt] = sort(max(neuron.C, [], 2), 'descend');
-neuron.orderROIs(srt);
-neuron_init = neuron.copy();
-
-%% iteratively update A, C and B
-% parameters, merge neurons
-
-% this part of the block is using an intense amount of ram, and is crashing
-% matlab
-
-display_merge = false;          % visually check the merged neurons
-view_neurons = false;           % view all neurons
-
-% parameters, estimate the background
-spatial_ds_factor = 2;      % spatial downsampling factor. it's for faster estimation
-% spatial_ds_factor = 1;
-thresh = 9;     % threshold for detecting frames with large cellular activity. (mean of neighbors' activity  + thresh*sn)
-
-% TODO: figure out what this means
-bg_neuron_ratio = 1;  % spatial range / diameter of neurons
-
-% parameters, estimate the spatial components
-update_spatial_method = 'hals';  % the method for updating spatial components {'hals', 'hals_thresh', 'nnls', 'lars'}
-Nspatial = 5;       % this variable has different meanings:
-                    %1) udpate_spatial_method=='hals' or 'hals_thresh',
-                    %then Nspatial is the maximum iteration
-                    %2) update_spatial_method== 'nnls', it is the maximum
-                    %number of neurons overlapping at one pixel
-
-% parameters for running iteratiosn
-nC = size(neuron.C, 1);    % number of neurons
-
-maxIter = 2;        % maximum number of iterations
-miter = 1;
-while miter <= maxIter
-    %% merge neurons, order neurons and delete some low quality neurons
-     if miter ==1
-        merge_thr = [1e-1, 0.8, .1];     % thresholds for merging neurons
-        % corresponding to {sptial overlaps, temporal correlation of C,
-        %temporal correlation of S}
-    else
-        merge_thr = [0.6, 0.5, 0.1];
-    end
-    % merge neurons
-    cnmfe_quick_merge;              % run neuron merges
-
-    %% udpate background (cell 1, the following three blocks can be run iteratively)
-    % estimate the background
-    tic;
-    cnmfe_update_BG;
-    fprintf('Time cost in estimating the background:        %.2f seconds\n', toc);
-    % neuron.playMovie(Ysignal); % play the video data after subtracting the background components.
-
-    %% update spatial & temporal components
-    tic;
-    for m=1:2
-        %temporal
-        neuron.updateTemporal_endoscope(Ysignal);
-        cnmfe_quick_merge;              % run neuron merges
-        %spatial
-        neuron.updateSpatial_endoscope(Ysignal, Nspatial, update_spatial_method);
-        neuron.trimSpatial(0.01, 3); % for each neuron, apply imopen first and then remove pixels that are not connected with the center
-        if isempty(merged_ROI)
-            break;
-        end
-    end
-    fprintf('Time cost in updating spatial & temporal components:     %.2f seconds\n', toc);
-
-    %% pick neurons from the residual (cell 4).
-    if miter==1
-        neuron.options.seed_method = 'auto'; % methods for selecting seed pixels {'auto', 'manual'}
-        [center_new, Cn_res, pnr_res] = neuron.pickNeurons(Ysignal - neuron.A*neuron.C, patch_par); % method can be either 'auto' or 'manual'
-    end
-
-    %% stop the iteration
-    temp = size(neuron.C, 1);
-    if or(nC==temp, miter==maxIter)
-        break;
-    else
-        miter = miter+1;
-        nC = temp;
-    end
-end
-
-%% apply results to the full resolution
-if or(ssub>1, tsub>1)
-    neuron_ds = neuron.copy();  % save the result
-    neuron = neuron_full.copy();
-    cnmfe_full;
-    neuron_full = neuron.copy();
-end
-
-
-%% delete some neurons and run CNMF-E iteration
-neuron.viewNeurons([], neuron.C_raw);
-tic;
-cnmfe_update_BG;
-fprintf('Time cost in estimating the background:        %.2f seconds\n', toc);
-%update spatial & temporal components
-tic;
-for m=1:2
-    %temporal
-    neuron.updateTemporal_endoscope(Ysignal);
-    cnmfe_quick_merge;              % run neuron merges
-    %spatial
-    neuron.updateSpatial_endoscope(Ysignal, Nspatial, update_spatial_method);
-    neuron.trimSpatial(0.01, 3); % for each neuron, apply imopen first and then remove pixels that are not connected with the center
-end
-fprintf('Time cost in updating spatial & temporal components:     %.2f seconds\n', toc);
-
-%% display neurons
-dir_neurons = sprintf('%s%s%s_neurons%s', dir_nm, filesep, file_nm, filesep);
-if exist('dir_neurons', 'dir')
-    temp = cd();
-    cd(dir_neurons);
-    delete *;
-    cd(temp);
-else
-    mkdir(dir_neurons);
-end
-neuron.viewNeurons([], neuron.C_raw, dir_neurons);
-close(gcf);
-
-%% display contours of the neurons
-neuron.Coor = neuron.get_contours(0.8); % energy within the contour is 80% of the total
-figure;
-Cnn = correlation_image(neuron.reshape(Ysignal(:, 1:5:end), 2), 4);
-neuron.Coor = plot_contours(neuron.A, Cnn, 0.8, 0, [], neuron.Coor, 2);
-colormap winter;
-axis equal; axis off;
-title('contours of estimated neurons');
-
-% plot contours with IDs
-% [Cn, pnr] = neuron.correlation_pnr(Y(:, round(linspace(1, T, min(T, 1000)))));
-figure;
-Cn = imresize(Cn, [d1, d2]);
-plot_contours(neuron.A, Cn, 0.8, 0, [], neuron.Coor, 2);
-colormap winter;
-title('contours of estimated neurons');
-
-%% check spatial and temporal components by playing movies
-save_avi = false;
-avi_name = 'play_movie.avi';
-neuron.Cn = Cn;
-neuron.runMovie(Ysignal, [0, 50], save_avi, avi_name);
-
-%% save video
-kt = 3;     % play one frame in every kt frames
-save_avi = true;
-center_ac = median(max(neuron.A,[],1)'.*max(neuron.C,[],2)); % the denoised video are mapped to [0, 2*center_ac] of the colormap
-cnmfe_save_video;
-
-%% save results
-globalVars = who('global');
-eval(sprintf('save %s%s%s_results.mat %s', dir_nm, filesep, file_nm, strjoin(globalVars)));
