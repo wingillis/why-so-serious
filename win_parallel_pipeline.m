@@ -11,7 +11,7 @@ global  d1 d2 numFrame ssub tsub sframe num2read Fs neuron neuron_ds ...
 
 %% select data and map it to RAM
 % nam = 'E:\CNMF_E-master\demos\data_endoscope.tif';
-nam = '/Volumes/Data 2/k9_01212017_kinect/motionCorrected.tif';
+% nam = '/Volumes/Data2/k9_01212017_kinect/motionCorre.mat';
 cnmfe_choose_data;
 
 %% create Source2D class object for storing results and parameters
@@ -93,7 +93,7 @@ axis equal off tight;
 title('Cn*PNR');
 %% create indices for splitting field-of-view into spatially-overlapping patches (for parallel processing)
 
-patch_size = [64, 64]; %patch size
+patch_size = [32, 32]; %patch size
 overlap = [12 12]; %patch overlap
 min_patch_sz = [16 16]; %minimum patch size in either direction
 patches = construct_patches(Ysiz(1:end-1),patch_size,overlap,min_patch_sz);
@@ -101,8 +101,8 @@ patches = construct_patches(Ysiz(1:end-1),patch_size,overlap,min_patch_sz);
 %% Load and run CNMF_E on full dataset in patches
 
 sframe=1;						% user input: first frame to read (optional, default:1)
-% num2read= numFrame;             % user input: how many frames to read (optional, default: until the end)
-num2read = 1000;
+num2read= numFrame;             % user input: how many frames to read (optional, default: until the end)
+% num2read = 1000;
 
 RESULTS(length(patches)) = struct();
 
@@ -110,7 +110,7 @@ RESULTS(length(patches)) = struct();
 % If you change main loop to a for loop (sequential processing), you can save space by condensing many of the
 % steps below into scripts, as is done in the original demo_endoscope.m
 
-parfor i = 1:length(patches)
+for i = 1:length(patches)
 
     % Load data from individual (i-th) patch and store in temporary Sources2D() object ('neuron_patch')
 
@@ -134,15 +134,16 @@ parfor i = 1:length(patches)
     % must initialize individual update-parameters within parfor loop to avoid
     % transparency violations
 
-    debug_on = false;   % visualize the initialization procedue.
+    debug_on = true;   % visualize the initialization procedue.
     save_avi = false;   %save the initialization procedure as an avi movie.
     patch_par = [1,1]*1; %1;  % divide the optical field into m X n patches and do initialization patch by patch. It can be used when the data is too large
     K = []; % maximum number of neurons to search within each patch. you can use [] to search the number automatically
 
-    min_corr = 0.6;     % minimum local correlation for a seeding pixel
-    min_pnr = 8;       % minimum peak-to-noise ratio for a seeding pixel
-    min_pixel = 4;      % minimum number of nonzero pixels for each neuron
-    bd = 7;             % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
+    min_corr = 0.65;     % minimum local correlation for a seeding pixel
+    min_pnr = 7.5;       % minimum peak-to-noise ratio for a seeding pixel
+    min_pixel = 5;      % minimum number of nonzero pixels for each neuron
+    % TODO: only set border for the full neuron??
+    bd = 0;             % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
     neuron_patch.updateParams('min_corr', min_corr, 'min_pnr', min_pnr, ...
         'min_pixel', min_pixel, 'bd', bd);
     neuron_patch.options.nk = 1;  % number of knots for detrending
@@ -179,7 +180,7 @@ parfor i = 1:length(patches)
         [~, srt] = sort(max(neuron_patch.C, [], 2), 'descend');
         neuron_patch.orderROIs(srt);
 
-        maxIter = 2;        % maximum number of iterations
+        maxIter = 2;  % maximum number of iterations
         miter = 1;
         while miter <= maxIter
            %% merge neurons, order neurons and delete some low quality neurons
@@ -189,7 +190,7 @@ parfor i = 1:length(patches)
            end
 
            if miter ==1
-               merge_thr = [1e-1, 0.8, .1];     % thresholds for merging neurons
+               merge_thr = [.1, .8, .1];     % thresholds for merging neurons
                % corresponding to {sptial overlaps, temporal correlation of C,
                %temporal correlation of S}
            else
@@ -225,13 +226,13 @@ parfor i = 1:length(patches)
                Ysigma = bsxfun(@minus,Ysignal,b0);
            end
 
-           fprintf('Time cost in estimating the background:        %.2f seconds\n', toc);
+           fprintf('Time cost in estimating the background:    %.2f seconds\n', toc);
             %% update spatial & temporal components
             tic;
             for m=1:2
                 %temporal
                 neuron_patch.updateTemporal_endoscope(Ysignal);
-
+                neuron_patch
                 % merge neurons
                 [merged_ROI, ~] = neuron_patch.quickMerge(merge_thr); % run neuron merges
                 %sort neurons
@@ -240,7 +241,8 @@ parfor i = 1:length(patches)
 
                 %spatial
                 neuron_patch.updateSpatial_endoscope(Ysignal, Nspatial, update_spatial_method);
-                neuron_patch.trimSpatial(0.01, 3); % for each neuron, apply imopen first and then remove pixels that are not connected with the center
+                % tricky
+                neuron_patch.trimSpatial(0.01, 2); % for each neuron, apply imopen first and then remove pixels that are not connected with the center
                 if isempty(merged_ROI)
                     break;
                 end
