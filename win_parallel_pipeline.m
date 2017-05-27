@@ -14,12 +14,6 @@ global  d1 d2 numFrame ssub tsub sframe num2read Fs neuron neuron_ds ...
 % nam = '/Volumes/Data2/k9_01212017_kinect/motionCorre.mat';
 cnmfe_choose_data;
 
-%% remove boundaries from the images you'd like to process
-border = 8; % pixels
-d1 = d1 - 2*border;
-d2 = d2 - 2*border;
-Ysiz(1) = d1;
-Ysiz(2) = d2;
 %% create Source2D class object for storing results and parameters
 Fs = 30;             % frame rate
 % downsamples my stuff by a factor of 8
@@ -63,7 +57,7 @@ num2read = 1000;
 if and(ssub==1, tsub==1)
     disp('Loading neuron subset')
     neuron_small = neuron_full;
-    Y = double(data.Y(border:end-border, border:end-border, sframe+(1:num2read)-1));
+    Y = double(data.Y(:, :, sframe+(1:num2read)-1));
     [d1s,d2s, T] = size(Y);
     fprintf('\nThe data has been loaded into RAM. It has %d X %d pixels X %d frames. \nLoading all data requires %.2f GB RAM\n\n', d1s, d2s, T, d1s*d2s*T*8/(2^30));
 else
@@ -125,7 +119,7 @@ for i = 1:length(patches)
     sframe_patch = sframe; num2read_patch = num2read;
 
     if and(ssub==1, tsub==1)
-        Y = double(data.Y(patches{i}(1)+border:patches{i}(2)+border,patches{i}(3)+border:patches{i}(4)+border,sframe_patch+(1:num2read_patch)-1));
+        Y = double(data.Y(patches{i}(1):patches{i}(2),patches{i}(3):patches{i}(4),sframe_patch+(1:num2read_patch)-1));
         [d1p, d2p, T] = size(Y);
     else
         Yraw = data.Y(patches{i}(1):patches{i}(2),patches{i}(3):patches{i}(4),sframe_patch+(1:num2read_patch)-1);
@@ -149,7 +143,6 @@ for i = 1:length(patches)
     min_corr = 0.65;     % minimum local correlation for a seeding pixel
     min_pnr = 7.5;       % minimum peak-to-noise ratio for a seeding pixel
     min_pixel = 5;      % minimum number of nonzero pixels for each neuron
-    % TODO: only set border for the full neuron??
     bd = 0;             % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
     neuron_patch.updateParams('min_corr', min_corr, 'min_pnr', min_pnr, ...
         'min_pixel', min_pixel, 'bd', bd);
@@ -348,4 +341,4 @@ neuron.Cn = Cn;
 
 %% save results
 globalVars = who('global');
-eval(sprintf('save %s%s%s_results.mat %s', dir_nm, filesep, file_nm, strjoin(globalVars)));
+eval(sprintf('save %s%s%s_results.mat %s', dir_nm, filesep, file_nm, [strjoin(globalVars) ' -v7.3']));
