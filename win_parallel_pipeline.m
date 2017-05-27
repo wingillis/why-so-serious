@@ -14,6 +14,12 @@ global  d1 d2 numFrame ssub tsub sframe num2read Fs neuron neuron_ds ...
 % nam = '/Volumes/Data2/k9_01212017_kinect/motionCorre.mat';
 cnmfe_choose_data;
 
+%% remove boundaries from the images you'd like to process
+border = 8; % pixels
+d1 = d1 - 2*border;
+d2 = d2 - 2*border;
+Ysiz(1) = d1;
+Ysiz(2) = d2;
 %% create Source2D class object for storing results and parameters
 Fs = 30;             % frame rate
 % downsamples my stuff by a factor of 8
@@ -55,8 +61,9 @@ sframe = 1;
 num2read = 1000;
 
 if and(ssub==1, tsub==1)
+    disp('Loading neuron subset')
     neuron_small = neuron_full;
-    Y = double(data.Y(:, :, sframe+(1:num2read)-1));
+    Y = double(data.Y(border:end-border, border:end-border, sframe+(1:num2read)-1));
     [d1s,d2s, T] = size(Y);
     fprintf('\nThe data has been loaded into RAM. It has %d X %d pixels X %d frames. \nLoading all data requires %.2f GB RAM\n\n', d1s, d2s, T, d1s*d2s*T*8/(2^30));
 else
@@ -93,7 +100,7 @@ axis equal off tight;
 title('Cn*PNR');
 %% create indices for splitting field-of-view into spatially-overlapping patches (for parallel processing)
 
-patch_size = [32, 32]; %patch size
+patch_size = [64, 64]; %patch size
 overlap = [12 12]; %patch overlap
 min_patch_sz = [16 16]; %minimum patch size in either direction
 patches = construct_patches(Ysiz(1:end-1),patch_size,overlap,min_patch_sz);
@@ -118,7 +125,7 @@ for i = 1:length(patches)
     sframe_patch = sframe; num2read_patch = num2read;
 
     if and(ssub==1, tsub==1)
-        Y = double(data.Y(patches{i}(1):patches{i}(2),patches{i}(3):patches{i}(4),sframe_patch+(1:num2read_patch)-1));
+        Y = double(data.Y(patches{i}(1)+border:patches{i}(2)+border,patches{i}(3)+border:patches{i}(4)+border,sframe_patch+(1:num2read_patch)-1));
         [d1p, d2p, T] = size(Y);
     else
         Yraw = data.Y(patches{i}(1):patches{i}(2),patches{i}(3):patches{i}(4),sframe_patch+(1:num2read_patch)-1);
@@ -134,7 +141,7 @@ for i = 1:length(patches)
     % must initialize individual update-parameters within parfor loop to avoid
     % transparency violations
 
-    debug_on = true;   % visualize the initialization procedue.
+    debug_on = false;   % visualize the initialization procedue.
     save_avi = false;   %save the initialization procedure as an avi movie.
     patch_par = [1,1]*1; %1;  % divide the optical field into m X n patches and do initialization patch by patch. It can be used when the data is too large
     K = []; % maximum number of neurons to search within each patch. you can use [] to search the number automatically
@@ -241,7 +248,7 @@ for i = 1:length(patches)
 
                 %spatial
                 neuron_patch.updateSpatial_endoscope(Ysignal, Nspatial, update_spatial_method);
-                % tricky
+                % tricky part
                 neuron_patch.trimSpatial(0.01, 2); % for each neuron, apply imopen first and then remove pixels that are not connected with the center
                 if isempty(merged_ROI)
                     break;
@@ -301,6 +308,8 @@ end
 
 neuron = neuron_full.copy();
 
+% clear reference to neuron_full
+clear neuron_full RESULTS;
 %% delete, trim, split neurons
 neuron.viewNeurons([], neuron.C_raw);
 
@@ -308,7 +317,9 @@ neuron.viewNeurons([], neuron.C_raw);
 display_merge = true; % set to true if you want to inspect every candidate merge
 view_neurons = false; % set to true if you want to inspect all neurons after quick merge routine
 
-merge_thr = [0.6, 0.5, 0.1];  % choose thresholds for merging neurons (this will primarily merge neurons redundantly found by multiple patch processes, likely in the patch-overlaps)
+% have lower thresholds because it doesn't do a great job merging the same neuron
+% detected in different patches
+merge_thr = [0.4, 0.4, 0.1];  % choose thresholds for merging neurons (this will primarily merge neurons redundantly found by multiple patch processes, likely in the patch-overlaps)
 cnmfe_quick_merge;            % run neuron merges
 
 %% display neurons
