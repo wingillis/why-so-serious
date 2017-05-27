@@ -28,3 +28,5 @@ extr = extr(1);
 %% go through different numbers of cells to see which ones explain the labels that
 % the model generates the best (figure out how to do this)
 rng(1); % set seed to predetermined value
+
+% should we think of correlating neurons across days?
