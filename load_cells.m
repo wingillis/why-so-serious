@@ -14,5 +14,13 @@ function [cells]=load_cells(type)
       % make it into a matrix
       cells = cell2mat(cells);
     end
+
+    if strcmp(type, 'csv')
+
+    end
+
+    if strcmp(type, 'cnmfe')
+
+    end
   end
 end
