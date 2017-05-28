@@ -14,6 +14,13 @@ global  d1 d2 numFrame ssub tsub sframe num2read Fs neuron neuron_ds ...
 % nam = '/Volumes/Data2/k9_01212017_kinect/motionCorre.mat';
 cnmfe_choose_data;
 
+dir_neurons = sprintf('%s%s%s_neurons%s', dir_nm, filesep, file_nm, filesep);
+if exist(dir_neurons, 'dir') == 7
+    % do nothing
+else
+    mkdir(dir_neurons);
+end
+
 %% create Source2D class object for storing results and parameters
 Fs = 30;             % frame rate
 % downsamples my stuff by a factor of 8
@@ -93,11 +100,13 @@ imagesc(Cn.*pnr, [0,max(pnr(:))*0.98]); colorbar;
 axis equal off tight;
 title('Cn*PNR');
 
+saveas(gcf, fullfile(dir_neurons, 'correlation.png'), 'png')
+
 pause;
 
 %% create indices for splitting field-of-view into spatially-overlapping patches (for parallel processing)
 
-patch_size = [64, 64]; %patch size
+patch_size = [d1, d2]; %patch size
 overlap = [12 12]; %patch overlap
 min_patch_sz = [16 16]; %minimum patch size in either direction
 patches = construct_patches(Ysiz(1:end-1),patch_size,overlap,min_patch_sz);
@@ -324,7 +333,7 @@ cnmfe_quick_merge;            % run neuron merges
 
 %% display neurons
 dir_neurons = sprintf('%s%s%s_neurons%s', dir_nm, filesep, file_nm, filesep);
-if exist('dir_neurons', 'dir')
+if exist(dir_neurons, 'dir') == 7
     temp = cd();
     cd(dir_neurons);
     delete *;
@@ -344,6 +353,9 @@ Cn = imresize(Cn, [d1, d2]);
 plot_contours(neuron.A, Cn, 0.8, 0, [], neuron.Coor, 2);
 colormap winter;
 title('contours of estimated neurons');
+saveas(gcf, fullfile(dir_neurons, 'contours.png'), 'png')
+
+
 neuron.Cn = Cn;
 
 %% save results
