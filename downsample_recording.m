@@ -12,7 +12,9 @@ function [fpath]=downsample_recording(mfpath, scale)
   % construct the variables for the matfile
   newmf = matfile(fpath, 'Writable', true);
   for i=1:oldsizY(3)
-    fprintf('On frame %d\n', i);
+    if mod(i, 1000) == 0
+      fprintf('%d frames finished\n', i);
+    end
     tmp = mf.Y(:,:,i);
     newY = imresize(tmp, ds);
     newmf.Y(:,:,i) = newY;
