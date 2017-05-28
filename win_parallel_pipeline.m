@@ -45,7 +45,7 @@ if with_dendrites
 else
     % determine the search locations by selecting a round area
     neuron_full.options.search_method = 'ellipse';
-    neuron_full.options.dist = 5;
+    neuron_full.options.dist = 4;
 end
 
 %% options for running deconvolution
@@ -114,10 +114,12 @@ patches = construct_patches(Ysiz(1:end-1),patch_size,overlap,min_patch_sz);
 %% Load and run CNMF_E on full dataset in patches
 
 sframe=1;						% user input: first frame to read (optional, default:1)
-% num2read= numFrame;             % user input: how many frames to read (optional, default: until the end)
+num2read = numFrame;             % user input: how many frames to read (optional, default: until the end)
 % time to test some stuff
-num2read = 1000;
-warning('Only reading 1000 frames: change this for actual analysis');
+% num2read = 1000;
+if num2read ~= numFrame
+  warning('Only reading a subset of frames: change this for actual full analysis');
+end
 
 RESULTS(length(patches)) = struct();
 
@@ -154,7 +156,7 @@ for i = 1:length(patches)
     patch_par = [1,1]*1; %1;  % divide the optical field into m X n patches and do initialization patch by patch. It can be used when the data is too large
     K = []; % maximum number of neurons to search within each patch. you can use [] to search the number automatically
 
-    min_corr = 0.85;     % minimum local correlation for a seeding pixel
+    min_corr = 0.8;     % minimum local correlation for a seeding pixel
     min_pnr = 20;       % minimum peak-to-noise ratio for a seeding pixel
     % when using 2x downsampled data, cells are about 2-3 pixels large
     min_pixel = 3;      % minimum number of nonzero pixels for each neuron
@@ -319,6 +321,11 @@ neuron = neuron_full.copy();
 
 % clear reference to neuron_full
 clear RESULTS;
+
+%% save the output so far, so that this can run overnight on orchestra
+globalVars = who('global');
+eval(sprintf('save %s%s%s_unprocessed.mat %s', dir_nm, filesep, file_nm, [strjoin(globalVars) ' -v7.3']));
+
 %% delete, trim, split neurons
 neuron.viewNeurons([], neuron.C_raw);
 
@@ -336,7 +343,7 @@ dir_neurons = sprintf('%s%s%s_neurons%s', dir_nm, filesep, file_nm, filesep);
 if exist(dir_neurons, 'dir') == 7
     temp = cd();
     cd(dir_neurons);
-    delete *;
+    delete neuron*.png;
     cd(temp);
 else
     mkdir(dir_neurons);
