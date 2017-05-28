@@ -307,7 +307,7 @@ end
 neuron = neuron_full.copy();
 
 % clear reference to neuron_full
-clear neuron_full RESULTS;
+clear RESULTS;
 %% delete, trim, split neurons
 neuron.viewNeurons([], neuron.C_raw);
 
