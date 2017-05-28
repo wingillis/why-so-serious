@@ -108,6 +108,7 @@ sframe=1;						% user input: first frame to read (optional, default:1)
 % num2read= numFrame;             % user input: how many frames to read (optional, default: until the end)
 % time to test some stuff
 num2read = 1000;
+warning('Only reading 1000 frames: change this for actual analysis');
 
 RESULTS(length(patches)) = struct();
 
