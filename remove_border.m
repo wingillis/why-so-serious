@@ -27,6 +27,6 @@ function [borderless]=remove_border(fname, border)
   sizY(1) = d1 - 2*border;
   sizY(2) = d2 - 2*border;
   mf2.sizY = sizY;
-  fprintf('New size: %d x %d', sizY(1), sizY(2));
+  fprintf('New size: %d x %d\n', sizY(1), sizY(2));
   borderless = mf2;
 end

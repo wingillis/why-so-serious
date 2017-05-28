@@ -1,6 +1,6 @@
 function [cells]=load_cells(type)
   % load extracted traces into matlab
-  % TODO: add suppor for path specification
+  % TODO: add support for path specification
   if ~exist('cells', 'var')==1
     % load cells
     objects = length(dir('Obj*'));

@@ -92,6 +92,9 @@ subplot(133);
 imagesc(Cn.*pnr, [0,max(pnr(:))*0.98]); colorbar;
 axis equal off tight;
 title('Cn*PNR');
+
+pause;
+
 %% create indices for splitting field-of-view into spatially-overlapping patches (for parallel processing)
 
 patch_size = [64, 64]; %patch size
@@ -102,8 +105,9 @@ patches = construct_patches(Ysiz(1:end-1),patch_size,overlap,min_patch_sz);
 %% Load and run CNMF_E on full dataset in patches
 
 sframe=1;						% user input: first frame to read (optional, default:1)
-num2read= numFrame;             % user input: how many frames to read (optional, default: until the end)
-% num2read = 1000;
+% num2read= numFrame;             % user input: how many frames to read (optional, default: until the end)
+% time to test some stuff
+num2read = 1000;
 
 RESULTS(length(patches)) = struct();
 
@@ -140,9 +144,9 @@ for i = 1:length(patches)
     patch_par = [1,1]*1; %1;  % divide the optical field into m X n patches and do initialization patch by patch. It can be used when the data is too large
     K = []; % maximum number of neurons to search within each patch. you can use [] to search the number automatically
 
-    min_corr = 0.65;     % minimum local correlation for a seeding pixel
-    min_pnr = 7.5;       % minimum peak-to-noise ratio for a seeding pixel
-    min_pixel = 5;      % minimum number of nonzero pixels for each neuron
+    min_corr = 0.85;     % minimum local correlation for a seeding pixel
+    min_pnr = 20;       % minimum peak-to-noise ratio for a seeding pixel
+    min_pixel = 4;      % minimum number of nonzero pixels for each neuron
     bd = 0;             % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
     neuron_patch.updateParams('min_corr', min_corr, 'min_pnr', min_pnr, ...
         'min_pixel', min_pixel, 'bd', bd);
@@ -232,7 +236,6 @@ for i = 1:length(patches)
             for m=1:2
                 %temporal
                 neuron_patch.updateTemporal_endoscope(Ysignal);
-                neuron_patch
                 % merge neurons
                 [merged_ROI, ~] = neuron_patch.quickMerge(merge_thr); % run neuron merges
                 %sort neurons
@@ -265,6 +268,8 @@ for i = 1:length(patches)
             end
         end
     end
+
+    fprintf('Found %d neurons\n', size(neuron_patch.C, 1));
 
     %% Store results from individual patch in master structure with every patch's output
 
@@ -312,7 +317,7 @@ view_neurons = false; % set to true if you want to inspect all neurons after qui
 
 % have lower thresholds because it doesn't do a great job merging the same neuron
 % detected in different patches
-merge_thr = [0.4, 0.4, 0.1];  % choose thresholds for merging neurons (this will primarily merge neurons redundantly found by multiple patch processes, likely in the patch-overlaps)
+merge_thr = [0.5, 0.5, 0.1];  % choose thresholds for merging neurons (this will primarily merge neurons redundantly found by multiple patch processes, likely in the patch-overlaps)
 cnmfe_quick_merge;            % run neuron merges
 
 %% display neurons
