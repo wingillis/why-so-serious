@@ -106,7 +106,7 @@ pause;
 
 %% create indices for splitting field-of-view into spatially-overlapping patches (for parallel processing)
 
-patch_size = [d1, d2]; %patch size
+patch_size = [ceil(d1/2), ceil(d2/2)]; %patch size
 overlap = [12 12]; %patch overlap
 min_patch_sz = [16 16]; %minimum patch size in either direction
 patches = construct_patches(Ysiz(1:end-1),patch_size,overlap,min_patch_sz);
@@ -127,7 +127,11 @@ RESULTS(length(patches)) = struct();
 % If you change main loop to a for loop (sequential processing), you can save space by condensing many of the
 % steps below into scripts, as is done in the original demo_endoscope.m
 
+disp('Going through the patches')
+
 for i = 1:length(patches)
+
+    fprintf('On patch %d\n', i);
 
     % Load data from individual (i-th) patch and store in temporary Sources2D() object ('neuron_patch')
 
@@ -165,6 +169,8 @@ for i = 1:length(patches)
         'min_pixel', min_pixel, 'bd', bd);
     neuron_patch.options.nk = 1;  % number of knots for detrending
 
+    fprintf('Initialization of endoscope\n')
+
     % greedy method for initialization
     neuron_patch.initComponents_endoscope(Y, K, patch_par, debug_on, save_avi);
 
@@ -199,6 +205,8 @@ for i = 1:length(patches)
 
         maxIter = 2;  % maximum number of iterations
         miter = 1;
+
+        fprintf('Iterating over neuron merging\n');
         while miter <= maxIter
            %% merge neurons, order neurons and delete some low quality neurons
 
@@ -219,6 +227,8 @@ for i = 1:length(patches)
            %sort neurons
            [~,srt] = sort(max(neuron_patch.C,[],2).*max(neuron_patch.A,[],1)','descend');
            neuron_patch.orderROIs(srt);
+
+           fprintf('Neurons merged and sorted\n');
 
            %% udpate background
            tic;
@@ -245,6 +255,7 @@ for i = 1:length(patches)
 
            fprintf('Time cost in estimating the background:    %.2f seconds\n', toc);
             %% update spatial & temporal components
+            fprintf('Updating spatial and temporal components\n');
             tic;
             for m=1:2
                 %temporal
