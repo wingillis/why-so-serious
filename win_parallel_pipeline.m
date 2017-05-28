@@ -146,7 +146,8 @@ for i = 1:length(patches)
 
     min_corr = 0.85;     % minimum local correlation for a seeding pixel
     min_pnr = 20;       % minimum peak-to-noise ratio for a seeding pixel
-    min_pixel = 4;      % minimum number of nonzero pixels for each neuron
+    % when using 2x downsampled data, cells are about 2-3 pixels large
+    min_pixel = 3;      % minimum number of nonzero pixels for each neuron
     bd = 0;             % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
     neuron_patch.updateParams('min_corr', min_corr, 'min_pnr', min_pnr, ...
         'min_pixel', min_pixel, 'bd', bd);
