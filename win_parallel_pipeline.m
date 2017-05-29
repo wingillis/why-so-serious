@@ -128,8 +128,8 @@ RESULTS(length(patches)) = struct();
 % steps below into scripts, as is done in the original demo_endoscope.m
 
 disp('Going through the patches')
-
-for i = 1:length(patches)
+pool = parpool(2);
+parfor i = 1:length(patches)
 
     fprintf('On patch %d\n', i);
 
