@@ -30,4 +30,4 @@ figure(1);
 subplot(2,1,1);
 imagesc(rps(1:2000, :)');
 subplot(2,1,2);
-plot(neuron.C_raw(1:10, 1:2000)');
+plot(grin.traces(2).raw(1:2000));
