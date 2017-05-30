@@ -27,7 +27,7 @@ fprintf('Nan frames %d\n', sum(isnan(extr.timestamps.inscopix)));
 fprintf('Number timestamps: %d\n', length(extr.timestamps.inscopix));
 fprintf('Number frames: %d\n', size(neuron.C, 2));
 
-
+% grab 10 of the cells
 grin = hifiber(neuron.C_raw(1:10, :), extr.timestamps.inscopix);
 
 figure(1);
