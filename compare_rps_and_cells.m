@@ -1,5 +1,6 @@
-% I copied the kinect_extract object from the _analysis/backup folder on Jeff's
-% orchestra group folder
+% I copied the kinect_extract object from
+% /groups/datta/Jeff/kinect2_data/inscopix/K9/_analysis/backup
+% on orchestra
 
 % directory
 d = '/Volumes/Data2/k9_01212017_kinect';
@@ -16,7 +17,7 @@ clear extract_object;
 % get the random projections
 rps = extr.projections.rp(:, 1:80);
 
-% load the cells
+% load the extracted cells
 load('motionCorre-borderless-downsample2x_results.mat')
 
 extr.load_inscopix_timestamps();
