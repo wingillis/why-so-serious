@@ -8,6 +8,7 @@ cd(d);
 % load it up
 load('../kinect_object.mat')
 
+% the 3rd object corresponds with the neuron extracted dataset I have
 extr = kinect_extract(3);
 
 clear kinect_extract;
