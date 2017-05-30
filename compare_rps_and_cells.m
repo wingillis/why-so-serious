@@ -30,4 +30,7 @@ figure(1);
 subplot(2,1,1);
 imagesc(rps(1:2000, :)');
 subplot(2,1,2);
-plot(grin.traces(2).raw(1:2000));
+hold on;
+for i=1:10
+  plot(grin.traces(i).raw(1:2000));
+end
