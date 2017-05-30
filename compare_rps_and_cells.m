@@ -21,7 +21,9 @@ load('motionCorre-borderless-downsample2x_results.mat')
 extr.load_inscopix_timestamps();
 
 
-fprintf('Nan frames %d', sum(isnan(extr.timestamps.inscopix)))
+fprintf('Nan frames %d\n', sum(isnan(extr.timestamps.inscopix)));
+fprintf('Number timestamps: %d\n', length(extr.timestamps.inscopix));
+fprintf('Number frames: %d\n', size(neuron.C, 2));
 
 
 grin = hifiber(neuron.C_raw(1:10, :), extr.timestamps.inscopix);
