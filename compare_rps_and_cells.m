@@ -9,9 +9,9 @@ cd(d);
 load('../kinect_object.mat')
 
 % the 3rd object corresponds with the neuron extracted dataset I have
-extr = kinect_extract(3);
+extr = extract_object(3);
 
-clear kinect_extract;
+clear extract_object;
 
 % get the random projections
 rps = extr.projections.rp(:, 1:80);
