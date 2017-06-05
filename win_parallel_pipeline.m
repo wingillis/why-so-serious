@@ -9,6 +9,7 @@ clear; clc; close all;
 global  d1 d2 numFrame ssub tsub sframe num2read Fs neuron neuron_ds ...
     neuron_full; %#ok<NUSED> % global variables, don't change them manually
 
+% addpath(genpath('/home/wg41/code/CNMF_E'));
 %% select data and map it to RAM
 % nam = 'E:\CNMF_E-master\demos\data_endoscope.tif';
 % nam = '/Volumes/Data2/k9_01212017_kinect/motionCorre.mat';
