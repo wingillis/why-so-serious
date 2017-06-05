@@ -30,3 +30,5 @@ extr = extr(1);
 rng(1); % set seed to predetermined value
 
 % should we think of correlating neurons across days?
+
+% interested in the spatial component of the cellular spiking as well
