@@ -27,3 +27,5 @@ Parameters that need to be set properly:
 - `min_pixel`
 
 Check these with `cnmfe_show_pnr`
+
+# Plan/Protocol for cell selection
