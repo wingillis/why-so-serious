@@ -1,14 +1,6 @@
-%% load the neuron/data here
-
-% look for file that has 'unprocessed' in its name
-dat_data = dir('*unprocessed*.mat');
+dat_data = dir('*_processed*.mat');
 dat_data_file = dat_data(1).name;
-% load it into this workspace
 load(dat_data_file);
-
-%% delete, trim, split neurons
-neuron.viewNeurons([], neuron.C_raw);
-
 %% merge neurons
 display_merge = true; % set to true if you want to inspect every candidate merge
 view_neurons = false; % set to true if you want to inspect all neurons after quick merge routine
@@ -48,5 +40,5 @@ saveas(gcf, fullfile(dir_neurons, 'contours.png'), 'png')
 neuron.Cn = Cn;
 
 %% save results
-globalVars = who('global');
-eval(sprintf('save %s%s%s_results.mat %s', dir_nm, filesep, file_nm, [strjoin(globalVars) ' -v7.3']));
+%globalVars = who('global');
+eval(sprintf('save %s%s%s_results.mat %s', dir_nm, filesep, file_nm, '-v7.3'));

@@ -18,9 +18,8 @@ end
 
 %% create Source2D class object for storing results and parameters
 Fs = 30;             % frame rate
-% downsamples my stuff by a factor of 8
 ssub = 1;           % spatial downsampling factor
-tsub = 1;           % temporal downsampling factor
+tsub = 5;           % temporal downsampling factor
 gSig = 3;           % width of the gaussian kernel, which can approximates the average neuron shape
 gSiz = 10;          % maximum diameter of neurons in the image plane. larger values are preferred.
 neuron_full = Sources2D('d1',d1,'d2',d2, ... % dimensions of datasets
@@ -101,7 +100,7 @@ close()
 %% create indices for splitting field-of-view into spatially-overlapping patches (for parallel processing)
 
 patch_size = [ceil(d1/2), ceil(d2/2)]; %patch size
-overlap = [12 12]; %patch overlap
+overlap = [20 20]; %patch overlap
 min_patch_sz = [16 16]; %minimum patch size in either direction
 patches = construct_patches(Ysiz(1:end-1),patch_size,overlap,min_patch_sz);
 
