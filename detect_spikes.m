@@ -7,5 +7,6 @@ function [spikes]=detect_spikes(cells, thresh)
   spikes = num2cell(spikes, 2);
   spikes = cellfun(@(x) conv(single(x), [1 -1], 'same'), spikes, 'UniformOutput', false);
   spikes = cell2mat(spikes);
+  % why do I do this right here:
   spikes = spikes(:, 1:end-1)==1;
 end  % function

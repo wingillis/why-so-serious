@@ -99,7 +99,7 @@ close()
 
 %% create indices for splitting field-of-view into spatially-overlapping patches (for parallel processing)
 
-patch_size = [ceil(d1/2), ceil(d2/2)]; %patch size
+patch_size = [ceil(d1/4), ceil(d2/4)]; %patch size
 overlap = [20 20]; %patch overlap
 min_patch_sz = [16 16]; %minimum patch size in either direction
 patches = construct_patches(Ysiz(1:end-1),patch_size,overlap,min_patch_sz);
