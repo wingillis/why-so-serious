@@ -29,3 +29,8 @@ Parameters that need to be set properly:
 Check these with `cnmfe_show_pnr`
 
 # Plan/Protocol for cell selection
+
+part1 and part 3 make into functions so that files are specified
+
+do domain patches instead of overlap
+look at how the background is substracted in the cnmfe code
