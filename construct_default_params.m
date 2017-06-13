@@ -1,5 +1,9 @@
 function [options] = construct_default_options(options)
 
+  if nargin < 1
+    options = struct();
+  end
+
   if ~isfield(options, 'patch_sz')
     options.patch_sz = [64 64]; % rndm default for how large the patches are
   end

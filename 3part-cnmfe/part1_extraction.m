@@ -41,17 +41,7 @@ end
 
 %% create Source2D class object for storing results and parameters
 Fs = 30;            % frame rate
-neuron_full = Sources2D('d1', d1, 'd2', d2, ... % dimensions of datasets
-    'ssub', options.ds_space, ...
-    'tsub', options.ds_time, ...  % downsampling
-    'gSig', options.gauss_kernel, ...    % sigma of the 2D gaussian that approximates cell bodies
-    'gSiz', options.neuron_dia, ...    % average neuron size (diameter)
-    'use_parallel', false,...    % disable parallellization within CNMF_E to avoid transparency violations
-    'temporal_parallel', false, ... % disable parallellization within CNMF_E
-    'min_corr', options.min_corr, ...
-    'min_pnr', options.min_pnr, ...
-    'bd', options.bd);
-neuron_full.Fs = Fs;         % frame rate
+neuron_full = make_cnmfe_class(d1, d2, Fs, options);
 
 % with dendrites or not
 if options.dendrites
@@ -74,31 +64,7 @@ neuron_full.options.deconv_options = struct('type', 'ar1', ... % model of the ca
 
 %% load small portion of data for displaying correlation image
 if options.save_corr_img
-  % balance number of frames to read against the image dimensions (d1 x d2) to
-  % limit RAM footprint
-  sframe = 1;
-  num2read = 1000;
-
-  if and(ssub==1, tsub==1)
-      disp('Loading neuron subset')
-      neuron_small = neuron_full;
-      Y = double(data.Y(:, :, sframe+(1:num2read)-1));
-      [d1s,d2s, T] = size(Y);
-      fprintf('\nThe data has been loaded into RAM. It has %d X %d pixels X %d frames. \nLoading all data requires %.2f GB RAM\n\n', d1s, d2s, T, d1s*d2s*T*8/(2^30));
-  else
-      [Y, neuron_ds] = neuron_full.load_data(nam, sframe, num2read);
-      [d1s,d2s, T] = size(Y);
-      fprintf('\nThe data has been downsampled and loaded into RAM. It has %d X %d pixels X %d frames. \nLoading all data requires %.2f GB RAM\n\n', d1s, d2s, T, d1s*d2s*T*8/(2^30));
-      neuron_small = neuron_ds.copy();
-  end
-
-  Y = neuron_small.reshape(Y,1);
-
-  %% compute correlation image and peak-to-noise ratio for selected portion of data
-  % this step is not necessary, but it can give you some hints on parameter selection, e.g., min_corr & min_pnr
-
-  [Cn, pnr] = neuron_small.correlation_pnr(Y(:, round(linspace(1, T, min(T, 1000)))));
-  corr_image(Cn, pnr, dir_neurons);
+  calc_corr_image(nam, options);
 end
 
 
@@ -128,7 +94,7 @@ for i = 1:length(patches)
   neuron_patch = neuron_full.copy();
 
   % get movie data relevant to this chunk
-  if and(ssub==1, tsub==1)
+  if and(options.ds_space==1, options.ds_time==1)
     % temporal info is the same, but spatial info is now in chunks
     % TODO: maybe turn this into single?
     Y = data.Y(patches{i}(1):patches{i}(2), ...
