@@ -1,25 +1,72 @@
 % make this into a function
-function [processed_path] = part1_extraction(nam)
+function [processed_path] = part1_extraction(nam, options)
 % this function assumes that you are passing a mat file that contains all the
 % frames from a grin lens recording experiment
 
-% TODO: make sure these are mapped properly
-global  d1 d2 numFrame ssub tsub sframe num2read Fs neuron neuron_ds ...
-    neuron_full; %#ok<NUSED> % global variables, don't change them manually
+% some flags
+SAVE_CORR_IMG=false;
+% TODO: add patch size options
+if nargin < 2
+  options = struct();
+end
 
-% addpath(genpath('/home/wg41/code/CNMF_E'));
+if ~isfield(options, 'patch_sz')
+  options.patch_sz = [64 64]; % rndm default for how large the patches are
+end
+
+if ~isfield(options, 'overlap')
+  options.overlap = [20 20]; % # pixels between chunks for overlap
+end
+
+if ~isfield(options, 'min_patch')
+  options.min_patch = [16 16]; % minimum patch size in either direction
+end
+
+if ~isfield(options, 'gauss_kernel')
+  % width of the gaussian kernel, which can approximates the average neuron shape
+  options.gauss_kernel = 5;
+end
+
+if ~isfield(options, 'neuron_dia')
+  % maximum diameter of neurons in the image plane. larger values are preferred
+  options.neuron_dia = 10;
+end
+
+if ~isfield(options, 'min_corr')
+  options.min_corr = 0.8;
+end
+
+if ~isfield(options, 'min_pnr')
+  options.min_pnr = 20;
+end
+
+if ~isfield(options, 'bd')
+  options.bd = 0;
+end
+
 %% select data and map it to RAM
 % following info is from: cnmfe_choose_data;
 [dir_nm, file_nm, file_type] = fileparts(nam);
 data = matfile(nam);
+% the size variable name could vary - this naming scheme is from
+% the memmap_file.m script in cnmfe
 Ysiz = data.sizY;
 d1 = Ysiz(1);   %height
 d2 = Ysiz(2);   %width
 numFrame = Ysiz(3);    %total number of frames
 
-dir_neurons = sprintf('%s%s%s_neurons%s', dir_nm, filesep, file_nm, filesep);
+%% create indices for splitting field-of-view into spatially overlapping patches (for parallel processing)
+patches = construct_patches([d1 d2], options.patch_sz, ...
+                            options.overlap, options.min_patch);
+
+% TODO: make sure these are mapped properly
+% global  d1 d2 numFrame ssub tsub sframe num2read Fs neuron neuron_ds ...
+%    neuron_full; %#ok<NUSED> % global variables, don't change them manually
+
+
+dir_neurons = fullfile(dir_nm, [file_nm '_neurons']);
 if exist(dir_neurons, 'dir') == 7
-    % do nothing
+    % do nothing - use it to save neurons
 else
     mkdir(dir_neurons);
 end
@@ -28,14 +75,15 @@ end
 Fs = 30;            % frame rate
 ssub = 1;           % spatial downsampling factor
 tsub = 5;           % temporal downsampling factor
-gSig = 5;           % width of the gaussian kernel, which can approximates the average neuron shape
-gSiz = 10;          % maximum diameter of neurons in the image plane. larger values are preferred.
-neuron_full = Sources2D('d1',d1,'d2',d2, ... % dimensions of datasets
+neuron_full = Sources2D('d1', d1, 'd2', d2, ... % dimensions of datasets
     'ssub', ssub, 'tsub', tsub, ...  % downsampling
-    'gSig', gSig,...    % sigma of the 2D gaussian that approximates cell bodies
-    'gSiz', gSiz,...    % average neuron size (diameter)
+    'gSig', options.gauss_kernel, ...    % sigma of the 2D gaussian that approximates cell bodies
+    'gSiz', options.neuron_dia, ...    % average neuron size (diameter)
     'use_parallel',false,...    % disable parallellization within CNMF_E to avoid transparency violations
-    'temporal_parallel',false); % disable parallellization within CNMF_E to avoid transparency violations
+    'temporal_parallel',false, ... % disable parallellization within CNMF_E
+    'min_corr', options.min_corr, ...
+    'min_pnr', options.min_pnr, ...
+    'bd', options.bd);
 neuron_full.Fs = Fs;         % frame rate
 
 % with dendrites or not
@@ -83,34 +131,10 @@ Y = neuron_small.reshape(Y,1);
 
 [Cn, pnr] = neuron_small.correlation_pnr(Y(:, round(linspace(1, T, min(T, 1000)))));
 
-% show correlation image
-figure('position', [10, 500, 1776, 400]);
-subplot(131);
-imagesc(Cn, [0, 1]); colorbar;
-axis equal off tight;
-title('correlation image');
+if SAVE_CORR_IMG
+  corr_image(Cn, pnr, dir_neurons);
+end
 
-% show peak-to-noise ratio
-subplot(132);
-imagesc(pnr,[0,max(pnr(:))*0.98]); colorbar;
-axis equal off tight;
-title('peak-to-noise ratio');
-
-% show pointwise product of correlation image and peak-to-noise ratio
-subplot(133);
-imagesc(Cn.*pnr, [0,max(pnr(:))*0.98]); colorbar;
-axis equal off tight;
-title('Cn*PNR');
-
-saveas(gcf, fullfile(dir_neurons, 'correlation.png'), 'png')
-close()
-
-%% create indices for splitting field-of-view into spatially-overlapping patches (for parallel processing)
-
-patch_size = [ceil(d1/4), ceil(d2/4)]; %patch size
-overlap = [20 20]; %patch overlap
-min_patch_sz = [16 16]; %minimum patch size in either direction
-patches = construct_patches(Ysiz(1:end-1),patch_size,overlap,min_patch_sz);
 
 %% Load and run CNMF_E on full dataset in patches
 
@@ -161,13 +185,10 @@ parfor i = 1:length(patches)
     patch_par = [1,1]*1; %1;  % divide the optical field into m X n patches and do initialization patch by patch. It can be used when the data is too large
     K = []; % maximum number of neurons to search within each patch. you can use [] to search the number automatically
 
-    min_corr = 0.8;     % minimum local correlation for a seeding pixel
-    min_pnr = 20;       % minimum peak-to-noise ratio for a seeding pixel
     % when using 2x downsampled data, cells are about 2-3 pixels large
     min_pixel = 3;      % minimum number of nonzero pixels for each neuron
     bd = 0;             % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
-    neuron_patch.updateParams('min_corr', min_corr, 'min_pnr', min_pnr, ...
-        'min_pixel', min_pixel, 'bd', bd);
+    neuron_patch.updateParams('min_pixel', min_pixel, 'bd', bd);
     neuron_patch.options.nk = 1;  % number of knots for detrending
 
     fprintf('Initialization of endoscope\n')
