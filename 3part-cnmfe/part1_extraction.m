@@ -4,67 +4,13 @@ function [processed_path] = part1_extraction(nam, options)
 % frames from a grin lens recording experiment
 
 % some flags
-SAVE_CORR_IMG=false;
 % TODO: add patch size options
 if nargin < 2
   options = struct();
 end
 
-if ~isfield(options, 'patch_sz')
-  options.patch_sz = [64 64]; % rndm default for how large the patches are
-end
-
-if ~isfield(options, 'overlap')
-  options.overlap = [20 20]; % # pixels between chunks for overlap
-end
-
-if ~isfield(options, 'min_patch')
-  options.min_patch = [16 16]; % minimum patch size in either direction
-end
-
-if ~isfield(options, 'gauss_kernel')
-  % width of the gaussian kernel, which can approximates the average neuron shape
-  options.gauss_kernel = 5;
-end
-
-if ~isfield(options, 'neuron_dia')
-  % maximum diameter of neurons in the image plane. larger values are preferred
-  options.neuron_dia = 10;
-end
-
-if ~isfield(options, 'min_corr')
-  options.min_corr = 0.8;
-end
-
-if ~isfield(options, 'min_pnr')
-  options.min_pnr = 20;
-end
-
-if ~isfield(options, 'bd')
-  options.bd = 0;
-end
-
-if ~isfield(options, 'dendrites')
-  options.dendrites = false;
-end
-
-if ~isfield(options, 'max_neurons')
-  options.max_neurons = []; % default searches for # neurons in sample
-end
-
-if ~isfield(options, 'spatial_corr')
-  options.spatial_corr = 0.6;
-end
-
-if ~isfield(options, 'temporal_corr')
-  options.temporal_corr = 0.5;
-end
-
-if ~isfield(options, 'spiketime_corr')
-  options.spiketime_corr = 0.1;
-end
-
-%% end option
+options = construct_default_params(options);
+%% end option construction
 
 %% select data and map it to RAM
 % following info is from: cnmfe_choose_data;
@@ -139,7 +85,7 @@ if and(ssub==1, tsub==1)
     [d1s,d2s, T] = size(Y);
     fprintf('\nThe data has been loaded into RAM. It has %d X %d pixels X %d frames. \nLoading all data requires %.2f GB RAM\n\n', d1s, d2s, T, d1s*d2s*T*8/(2^30));
 else
-    [Y, neuron_ds] = neuron_full.load_data(nam_mat, sframe, num2read);
+    [Y, neuron_ds] = neuron_full.load_data(nam, sframe, num2read);
     [d1s,d2s, T] = size(Y);
     fprintf('\nThe data has been downsampled and loaded into RAM. It has %d X %d pixels X %d frames. \nLoading all data requires %.2f GB RAM\n\n', d1s, d2s, T, d1s*d2s*T*8/(2^30));
     neuron_small = neuron_ds.copy();
@@ -152,7 +98,7 @@ Y = neuron_small.reshape(Y,1);
 
 [Cn, pnr] = neuron_small.correlation_pnr(Y(:, round(linspace(1, T, min(T, 1000)))));
 
-if SAVE_CORR_IMG
+if options.save_corr_img
   corr_image(Cn, pnr, dir_neurons);
 end
 
@@ -174,8 +120,7 @@ RESULTS(length(patches)) = struct();
 % steps below into scripts, as is done in the original demo_endoscope.m
 
 disp('Going through the patches');
-pool = parpool(2);
-parfor i = 1:length(patches)
+for i = 1:length(patches)
 
   fprintf('On patch %d\n', i);
 
@@ -382,5 +327,6 @@ end
   neuron = neuron_full.copy();
 
   %% save the output so far, so that this can run overnight on orchestra
-  save(fullfile(dir_nm, [file_nm '_unprocessed.mat']), {'neuron'}, '-v7.3')
+  processed_path = fullfile(dir_nm, [file_nm '_unprocessed.mat']);
+  save(processed_path, 'neuron', 'd1', 'd2', 'numFrame', 'tsub', 'ssub', 'Fs', '-v7.3')
 end % function
