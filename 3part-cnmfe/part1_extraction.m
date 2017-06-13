@@ -1,13 +1,21 @@
-%% clear workspace
-clear; clc; close all;
+% make this into a function
+function [processed_path] = part1_extraction(nam)
+% this function assumes that you are passing a mat file that contains all the
+% frames from a grin lens recording experiment
+
+% TODO: make sure these are mapped properly
 global  d1 d2 numFrame ssub tsub sframe num2read Fs neuron neuron_ds ...
     neuron_full; %#ok<NUSED> % global variables, don't change them manually
 
 % addpath(genpath('/home/wg41/code/CNMF_E'));
 %% select data and map it to RAM
-% nam = 'E:\CNMF_E-master\demos\data_endoscope.tif';
-% nam = '/Volumes/Data2/k9_01212017_kinect/motionCorre.mat';
-cnmfe_choose_data;
+% following info is from: cnmfe_choose_data;
+[dir_nm, file_nm, file_type] = fileparts(nam);
+data = matfile(nam);
+Ysiz = data.sizY;
+d1 = Ysiz(1);   %height
+d2 = Ysiz(2);   %width
+numFrame = Ysiz(3);    %total number of frames
 
 dir_neurons = sprintf('%s%s%s_neurons%s', dir_nm, filesep, file_nm, filesep);
 if exist(dir_neurons, 'dir') == 7
@@ -17,17 +25,17 @@ else
 end
 
 %% create Source2D class object for storing results and parameters
-Fs = 30;             % frame rate
+Fs = 30;            % frame rate
 ssub = 1;           % spatial downsampling factor
 tsub = 5;           % temporal downsampling factor
-gSig = 3;           % width of the gaussian kernel, which can approximates the average neuron shape
+gSig = 5;           % width of the gaussian kernel, which can approximates the average neuron shape
 gSiz = 10;          % maximum diameter of neurons in the image plane. larger values are preferred.
 neuron_full = Sources2D('d1',d1,'d2',d2, ... % dimensions of datasets
-    'ssub', ssub, 'tsub', tsub, ...  % downsampleing
+    'ssub', ssub, 'tsub', tsub, ...  % downsampling
     'gSig', gSig,...    % sigma of the 2D gaussian that approximates cell bodies
     'gSiz', gSiz,...    % average neuron size (diameter)
-    'use_parallel',false,... %disable parallellization within CNMF_E to avoid transparency violations
-    'temporal_parallel',false); %disable parallellization within CNMF_E to avoid transparency violations
+    'use_parallel',false,...    % disable parallellization within CNMF_E to avoid transparency violations
+    'temporal_parallel',false); % disable parallellization within CNMF_E to avoid transparency violations
 neuron_full.Fs = Fs;         % frame rate
 
 % with dendrites or not
@@ -329,3 +337,4 @@ clear RESULTS;
 %% save the output so far, so that this can run overnight on orchestra
 globalVars = who('global');
 eval(sprintf('save %s%s%s_unprocessed.mat %s', dir_nm, filesep, file_nm, [strjoin(globalVars) ' -v7.3']));
+end % function
