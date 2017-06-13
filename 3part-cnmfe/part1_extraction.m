@@ -48,6 +48,10 @@ if ~isfield(options, 'dendrites')
   options.dendrites = false;
 end
 
+if ~isfield(options, 'max_neurons')
+  options.max_neurons = []; % default searches for # neurons in sample
+end
+
 %% end option
 
 %% select data and map it to RAM
@@ -167,6 +171,7 @@ parfor i = 1:length(patches)
 
     neuron_patch = neuron_full.copy();
 
+    % get movie data relevant to this chunk
     if and(ssub==1, tsub==1)
       % temporal info is the same, but spatial info is now in chunks
       % TODO: maybe turn this into single?
@@ -186,15 +191,14 @@ parfor i = 1:length(patches)
     end
 
     neuron_patch.updateParams('d1', d1p, 'd2', d2p);
-    % neuron_patch.options.d1 = d1p; neuron_patch.options.d2 = d2p;
-    Y = neuron_patch.reshape(Y, 1);       % convert a 3D video into a 2D matrix
+    Y = neuron_patch.reshape(Y, 1);  % convert a 3D video into a 2D matrix
 
-    %% Initialization of A,C -- parameters
+    %% Initialization of A, C -- parameters
     % must initialize individual update-parameters within parfor loop to avoid
     % transparency violations
 
     debug_on = false;   % visualize the initialization procedue.
-    save_avi = false;   %save the initialization procedure as an avi movie.
+    save_avi = false;   % save the initialization procedure as an avi movie.
     patch_par = [1,1]*1; %1;  % divide the optical field into m X n patches and do initialization patch by patch. It can be used when the data is too large
     K = []; % maximum number of neurons to search within each patch. you can use [] to search the number automatically
 
@@ -202,20 +206,24 @@ parfor i = 1:length(patches)
     min_pixel = 3;      % minimum number of nonzero pixels for each neuron
     bd = 0;             % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
     neuron_patch.updateParams('min_pixel', min_pixel, 'bd', bd);
+
+    % not found in CNMFESetParms script - don't know if it will work in
+    % neuron_patch.updateParams
     neuron_patch.options.nk = 1;  % number of knots for detrending
 
     fprintf('Initialization of endoscope\n')
 
     % greedy method for initialization
-    neuron_patch.initComponents_endoscope(Y, K, patch_par, debug_on, save_avi);
+    neuron_patch.initComponents_endoscope(Y, options.max_neurons, ...
+                                          patch_par, debug_on, save_avi);
 
     %% iteratively update A, C and B
     % must initialize individual update-parameters within parfor loop to avoid
     % transparency violations
 
     % parameters, estimate the background
-    spatial_ds_factor = 1;      % spatial downsampling factor. it's for faster estimation
-    thresh = 10;     % threshold for detecting frames with large cellular activity. (mean of neighbors' activity  + thresh*sn)
+    spatial_ds_factor = 1; % spatial downsampling factor. it's for faster estimation
+    thresh = 10; % threshold for detecting frames with large cellular activity. (mean of neighbors' activity  + thresh*sn)
 
     bg_neuron_ratio = 1;  % spatial range / diameter of neurons
 
@@ -235,8 +243,7 @@ parfor i = 1:length(patches)
 
     if nC>0 % check for presence of neurons in patch
         % sort neurons
-        [~, srt] = sort(max(neuron_patch.C, [], 2), 'descend');
-        neuron_patch.orderROIs(srt);
+        neuron_patch.orderROIs();
 
         maxIter = 2;  % maximum number of iterations
         miter = 1;
@@ -260,8 +267,7 @@ parfor i = 1:length(patches)
            % merge neurons
            neuron_patch.quickMerge(merge_thr); % run neuron merges
            %sort neurons
-           [~,srt] = sort(max(neuron_patch.C,[],2).*max(neuron_patch.A,[],1)','descend');
-           neuron_patch.orderROIs(srt);
+           neuron_patch.orderROIs();
 
            fprintf('Neurons merged and sorted\n');
 
