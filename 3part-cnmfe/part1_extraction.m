@@ -44,6 +44,12 @@ if ~isfield(options, 'bd')
   options.bd = 0;
 end
 
+if ~isfield(options, 'dendrites')
+  options.dendrites = false;
+end
+
+%% end option
+
 %% select data and map it to RAM
 % following info is from: cnmfe_choose_data;
 [dir_nm, file_nm, file_type] = fileparts(nam);
@@ -87,8 +93,7 @@ neuron_full = Sources2D('d1', d1, 'd2', d2, ... % dimensions of datasets
 neuron_full.Fs = Fs;         % frame rate
 
 % with dendrites or not
-with_dendrites = false;
-if with_dendrites
+if options.dendrites
     % determine the search locations by dilating the current neuron shapes
     neuron_full.options.search_method = 'dilate';
     neuron_full.options.bSiz = 20;
@@ -143,7 +148,7 @@ num2read = numFrame;             % user input: how many frames to read (optional
 % time to test some stuff
 % num2read = 1000;
 if num2read ~= numFrame
-  warning('Only reading a subset of frames: change this for actual full analysis');
+  warning('Only reading a subset of frames: change this for full analysis');
 end
 
 RESULTS(length(patches)) = struct();
@@ -152,7 +157,7 @@ RESULTS(length(patches)) = struct();
 % If you change main loop to a for loop (sequential processing), you can save space by condensing many of the
 % steps below into scripts, as is done in the original demo_endoscope.m
 
-disp('Going through the patches')
+disp('Going through the patches');
 pool = parpool(2);
 parfor i = 1:length(patches)
 
@@ -161,19 +166,27 @@ parfor i = 1:length(patches)
     % Load data from individual (i-th) patch and store in temporary Sources2D() object ('neuron_patch')
 
     neuron_patch = neuron_full.copy();
-    sframe_patch = sframe; num2read_patch = num2read;
 
     if and(ssub==1, tsub==1)
-        Y = double(data.Y(patches{i}(1):patches{i}(2),patches{i}(3):patches{i}(4),sframe_patch+(1:num2read_patch)-1));
-        [d1p, d2p, T] = size(Y);
+      % temporal info is the same, but spatial info is now in chunks
+      % TODO: maybe turn this into single?
+      Y = data.Y(patches{i}(1):patches{i}(2), ...
+                        patches{i}(3):patches{i}(4), ...
+                        (sframe-1)+(1:num2read));
+      Y = double(Y);
+      [d1p, d2p, T] = size(Y);
     else
-        Yraw = data.Y(patches{i}(1):patches{i}(2),patches{i}(3):patches{i}(4),sframe_patch+(1:num2read_patch)-1);
-        [neuron_patch_ds, Y] = neuron_patch.downSample(double(Yraw));
-        [d1p, d2p, T] = size(Y);
-        neuron_patch = neuron_patch_ds.copy();
+      Yraw = data.Y(patches{i}(1):patches{i}(2), ...
+                    patches{i}(3):patches{i}(4), ...
+                    (sframe-1)+(1:num2read));
+      [neuron_patch_ds, Y] = neuron_patch.downSample(double(Yraw));
+      [d1p, d2p, T] = size(Y);
+      neuron_patch = neuron_patch_ds.copy();
+      clear neuron_patch_ds;
     end
 
-    neuron_patch.options.d1 = d1p; neuron_patch.options.d2 = d2p;
+    neuron_patch.updateParams('d1', d1p, 'd2', d2p);
+    % neuron_patch.options.d1 = d1p; neuron_patch.options.d2 = d2p;
     Y = neuron_patch.reshape(Y, 1);       % convert a 3D video into a 2D matrix
 
     %% Initialization of A,C -- parameters
