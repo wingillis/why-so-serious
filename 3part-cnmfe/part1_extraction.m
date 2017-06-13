@@ -264,20 +264,20 @@ parfor i = 1:length(patches)
         merge_thr = [0.6, 0.5, 0.1];
       end
 
-       % merge neurons
-       neuron_patch.quickMerge(merge_thr); % run neuron merges
-       %sort neurons
-       neuron_patch.orderROIs();
+      % merge neurons
+      neuron_patch.quickMerge(merge_thr); % run neuron merges
+      %sort neurons
+      neuron_patch.orderROIs();
 
-       fprintf('Neurons merged and sorted\n');
+      fprintf('Neurons merged and sorted\n');
 
-       %% udpate background
-       tic;
+      %% udpate background
+      tic;
 
-       Ybg = Y-neuron_patch.A*neuron_patch.C;
-       rr = ceil(neuron_patch.options.gSiz * bg_neuron_ratio);
-       active_px = []; %(sum(IND, 2)>0); %If some missing neurons are not covered by active_px, use [] to replace IND
-       [Ybg, ~] = neuron_patch.localBG(Ybg,spatial_ds_factor,rr,active_px,neuron_patch.P.sn,thresh); %estimate local background
+      Ybg = Y-neuron_patch.A*neuron_patch.C;
+      rr = ceil(neuron_patch.options.gSiz * bg_neuron_ratio);
+      active_px = []; %(sum(IND, 2)>0); %If some missing neurons are not covered by active_px, use [] to replace IND
+      [Ybg, ~] = neuron_patch.localBG(Ybg, spatial_ds_factor, rr, active_px, neuron_patch.P.sn, thresh); %estimate local background
 
        %subtract background from the raw data to obtain signal for
        %subsequent CNMF
