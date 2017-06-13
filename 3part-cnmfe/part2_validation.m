@@ -1,4 +1,6 @@
+function part2_validation(fname)
 %% load the neuron/data here
+
 
 % look for file that has 'unprocessed' in its name
 dat_data = dir('*unprocessed*.mat');
@@ -10,3 +12,5 @@ load(dat_data_file);
 neuron.viewNeurons([], neuron.C_raw);
 
 save(strrep(dat_data_file, 'unprocessed', '_processed'), '-v7.3');
+
+end

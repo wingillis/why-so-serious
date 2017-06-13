@@ -293,5 +293,5 @@ end
 
   %% save the output so far, so that this can run overnight on orchestra
   processed_path = fullfile(dir_nm, [file_nm '_unprocessed.mat']);
-  save(processed_path, 'neuron', 'd1', 'd2', 'numFrame', 'tsub', 'ssub', 'Fs', '-v7.3')
+  save(processed_path, 'neuron', 'd1', 'd2', 'numFrame', 'options', 'Fs', '-v7.3')
 end % function
