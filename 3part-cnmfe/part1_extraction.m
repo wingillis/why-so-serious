@@ -52,6 +52,18 @@ if ~isfield(options, 'max_neurons')
   options.max_neurons = []; % default searches for # neurons in sample
 end
 
+if ~isfield(options, 'spatial_corr')
+  options.spatial_corr = 0.6;
+end
+
+if ~isfield(options, 'temporal_corr')
+  options.temporal_corr = 0.5;
+end
+
+if ~isfield(options, 'spiketime_corr')
+  options.spiketime_corr = 0.1;
+end
+
 %% end option
 
 %% select data and map it to RAM
@@ -256,12 +268,12 @@ parfor i = 1:length(patches)
          break
       end
 
-      if miter ==1
-        merge_thr = [.1, .8, .1];     % thresholds for merging neurons
+      if miter == 1
+        merge_thr = [.1 .8 .1];     % thresholds for merging neurons
         % corresponding to {sptial overlaps, temporal correlation of C,
         %temporal correlation of S}
       else
-        merge_thr = [0.6, 0.5, 0.1];
+        merge_thr = [options.spatial_corr options.temporal_corr options.spiketime_corr];
       end
 
       % merge neurons
@@ -274,7 +286,7 @@ parfor i = 1:length(patches)
       %% udpate background
       tic;
 
-      Ybg = Y-neuron_patch.A*neuron_patch.C;
+      Ybg = Y - neuron_patch.A * neuron_patch.C;
       rr = ceil(neuron_patch.options.gSiz * bg_neuron_ratio);
       active_px = []; %(sum(IND, 2)>0); %If some missing neurons are not covered by active_px, use [] to replace IND
       [Ybg, ~] = neuron_patch.localBG(Ybg, spatial_ds_factor, rr, active_px, neuron_patch.P.sn, thresh); %estimate local background
@@ -284,57 +296,57 @@ parfor i = 1:length(patches)
        Ysignal = Y - Ybg;
 
        % estimate noise
-       if ~isfield(neuron_patch.P,'sn') || isempty(neuron_patch.P.sn)
-           % estimate the noise for all pixels
-           b0 = zeros(size(Ysignal,1), 1);
-           sn = b0;
-           for m = 1:size(neuron_patch.A,1)
-               [b0(m), sn(m)] = estimate_baseline_noise(Ysignal(m,:));
-           end
-           Ysigma = bsxfun(@minus,Ysignal,b0);
-       end
-
-       fprintf('Time cost in estimating the background:    %.2f seconds\n', toc);
-        %% update spatial & temporal components
-        fprintf('Updating spatial and temporal components\n');
-        tic;
-        for m=1:2
-            %temporal
-            neuron_patch.updateTemporal_endoscope(Ysignal);
-            % merge neurons
-            [merged_ROI, ~] = neuron_patch.quickMerge(merge_thr); % run neuron merges
-            %sort neurons
-            [~,srt] = sort(max(neuron_patch.C,[],2).*max(neuron_patch.A,[],1)','descend');
-            neuron_patch.orderROIs(srt);
-
-            %spatial
-            neuron_patch.updateSpatial_endoscope(Ysignal, Nspatial, update_spatial_method);
-            % tricky part
-            neuron_patch.trimSpatial(0.01, 2); % for each neuron, apply imopen first and then remove pixels that are not connected with the center
-            if isempty(merged_ROI)
-                break;
-            end
-          end
-          fprintf('Time cost in updating spatial & temporal components:     %.2f seconds\n', toc);
-
-          %% pick neurons from the residual (cell 4).
-          if miter==1
-              neuron_patch.options.seed_method = 'auto'; % methods for selecting seed pixels {'auto', 'manual'}
-              [center_new, Cn_res, pnr_res] = neuron_patch.pickNeurons(Ysignal - neuron_patch.A*neuron_patch.C, patch_par); % method can be either 'auto' or 'manual'
-          end
-
-          %% stop the iteration
-          temp = size(neuron_patch.C, 1);
-          if or(nC==temp, miter==maxIter)
-              break;
-          else
-              miter = miter+1;
-              nC = temp;
-          end
+      if ~isfield(neuron_patch.P, 'sn') || isempty(neuron_patch.P.sn)
+        % estimate the noise for all pixels
+        b0 = zeros(size(Ysignal,1), 1);
+        sn = zeros(size(b0));
+        for m = 1:size(neuron_patch.A,1)
+          [b0(m), sn(m)] = estimate_baseline_noise(Ysignal(m,:));
+        end
+        Ysigma = bsxfun(@minus,Ysignal,b0);
       end
+
+      fprintf('Time cost in estimating the background:    %.2f seconds\n', toc);
+      %% update spatial & temporal components
+      fprintf('Updating spatial and temporal components\n');
+      tic;
+      for m=1:2
+        % temporal
+        neuron_patch.updateTemporal_endoscope(Ysignal);
+        % merge neurons
+        [merged_ROI, ~] = neuron_patch.quickMerge(merge_thr); % run neuron merges
+        %sort neurons
+        [~,srt] = sort(max(neuron_patch.C,[],2).*max(neuron_patch.A,[],1)','descend');
+        neuron_patch.orderROIs(srt);
+
+        %spatial
+        neuron_patch.updateSpatial_endoscope(Ysignal, Nspatial, update_spatial_method);
+        % tricky part
+        neuron_patch.trimSpatial(0.01, 2); % for each neuron, apply imopen first and then remove pixels that are not connected with the center
+        if isempty(merged_ROI)
+          break;
+        end
+      end
+      fprintf('Time cost in updating spatial & temporal components:     %.2f seconds\n', toc);
+
+      %% pick neurons from the residual (cell 4).
+      if miter==1
+        neuron_patch.options.seed_method = 'auto'; % methods for selecting seed pixels {'auto', 'manual'}
+        [center_new, Cn_res, pnr_res] = neuron_patch.pickNeurons(Ysignal - neuron_patch.A * neuron_patch.C, patch_par); % method can be either 'auto' or 'manual'
+      end
+
+      %% stop the iteration
+      temp = size(neuron_patch.C, 1);
+      if or(nC==temp, miter==maxIter)
+        break;
+      else
+        miter = miter+1;
+        nC = temp;
+      end
+    end
   end
 
-  fprintf('Found %d neurons\n', size(neuron_patch.C, 1));
+  fprintf('Found %d neurons\n', size(nC, 1));
 
   %% Store results from individual patch in master structure with every patch's output
 
@@ -343,38 +355,32 @@ parfor i = 1:length(patches)
   RESULTS(i).C_raw = neuron_patch.C_raw;
   RESULTS(i).S = neuron_patch.S;
   RESULTS(i).P = neuron_patch.P;
-  fprintf(['Finished processing patch # ',num2str(i),' out of ',num2str(length(patches)), '.\n']);
 
+  fprintf('Finished processing patch # %d of %d.\n', i, length(patches));
 end
 
-%% Store all patches in full Sources2D object for full dataset
+  %% Store all patches in full Sources2D object for full dataset
 
-neuron_full.P.kernel_pars = [];
-for i = 1:length(patches)
+  neuron_full.P.kernel_pars = [];
+  for i = 1:length(patches)
     if size(RESULTS(i).A,2)>0
-        % Atemp = zeros(neuron_full.options.d1/2,neuron_full.options.d2/2,size(RESULTS(i).A,2));
-        Atemp = zeros(neuron_full.options.d1,neuron_full.options.d2,size(RESULTS(i).A,2));
-        for k = 1:size(RESULTS(i).A,2)
-            % Atemp(ceil(patches{i}(1)/2):ceil(patches{i}(2)/2),ceil(patches{i}(3)/2):ceil(patches{i}(4)/2),k)=reshape(RESULTS(i).A(:,k),(patches{i}(2)-patches{i}(1)+1)/2,(patches{i}(4)-patches{i}(3)+1)/2);
-            Atemp(patches{i}(1):patches{i}(2),patches{i}(3):patches{i}(4),k)=reshape(RESULTS(i).A(:,k),patches{i}(2)-patches{i}(1)+1,patches{i}(4)-patches{i}(3)+1);
-        end
-        neuron_full.A = [neuron_full.A,reshape(Atemp,d1*d2,k)];
-        % neuron_full.A = [neuron_full.A,reshape(Atemp,d1/2*d2/2,k)];
-        neuron_full.C = [neuron_full.C;RESULTS(i).C];
-        neuron_full.C_raw = [neuron_full.C_raw;RESULTS(i).C_raw];
-        neuron_full.S = [neuron_full.S;RESULTS(i).S];
-        neuron_full.P.sn = [neuron_full.P.sn,RESULTS(i).P.sn];
-        neuron_full.P.kernel_pars = [neuron_full.P.kernel_pars;RESULTS(i).P.kernel_pars];
-    end
-    clear Atemp;
-end
+      % Atemp = zeros(neuron_full.options.d1/2,neuron_full.options.d2/2,size(RESULTS(i).A,2));
+      Atemp = zeros(neuron_full.options.d1,neuron_full.options.d2,size(RESULTS(i).A,2));
+      for k = 1:size(RESULTS(i).A,2)
+        Atemp(patches{i}(1):patches{i}(2), patches{i}(3):patches{i}(4), k) =  reshape(RESULTS(i).A(:, k), patches{i}(2)-patches{i}(1)+1, patches{i}(4)-patches{i}(3)+1);
+      end
+      neuron_full.A = [neuron_full.A, reshape(Atemp,d1*d2,k)];
+      neuron_full.C = [neuron_full.C; RESULTS(i).C];
+      neuron_full.C_raw = [neuron_full.C_raw; RESULTS(i).C_raw];
+      neuron_full.S = [neuron_full.S; RESULTS(i).S];
+      neuron_full.P.sn = [neuron_full.P.sn, RESULTS(i).P.sn];
+      neuron_full.P.kernel_pars = [neuron_full.P.kernel_pars; RESULTS(i).P.kernel_pars];
+      end
+      clear Atemp;
+  end
 
-neuron = neuron_full.copy();
+  neuron = neuron_full.copy();
 
-% clear reference to neuron_full
-clear RESULTS;
-
-%% save the output so far, so that this can run overnight on orchestra
-globalVars = who('global');
-eval(sprintf('save %s%s%s_unprocessed.mat %s', dir_nm, filesep, file_nm, [strjoin(globalVars) ' -v7.3']));
+  %% save the output so far, so that this can run overnight on orchestra
+  save(fullfile(dir_nm, [file_nm '_unprocessed.mat']), {'neuron'}, '-v7.3')
 end % function

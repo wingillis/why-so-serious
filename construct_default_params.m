@@ -9,4 +9,8 @@ function [options] = construct_default_options()
   options.bd = 0;
   options.dendrites = false;
   options.max_neurons = [];
+
+  options.spatial_corr = 0.6;
+  options.temporal_corr = 0.5;
+  options.spiketime_corr = 0.1;
 end % function
