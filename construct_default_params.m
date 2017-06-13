@@ -26,6 +26,14 @@ function [options] = construct_default_options(options)
     options.min_corr = 0.8;
   end
 
+  if ~isfield(options, 'ds_time')
+    options.ds_time = 5;
+  end
+
+  if ~isfield(options, 'ds_space')
+    options.ds_space = 1;
+  end
+
   if ~isfield(options, 'min_pnr')
     options.min_pnr = 20;
   end
