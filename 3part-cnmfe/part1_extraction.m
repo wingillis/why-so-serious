@@ -18,7 +18,11 @@ options = construct_default_params(options);
 data = matfile(nam);
 % the size variable name could vary - this naming scheme is from
 % the memmap_file.m script in cnmfe
-Ysiz = data.sizY;
+if isempty(whos(mf, 'sizY'))
+  Ysiz = data.Ysiz;
+else
+  Ysiz = data.sizY;
+end
 d1 = Ysiz(1);   %height
 d2 = Ysiz(2);   %width
 numFrame = Ysiz(3);    %total number of frames
