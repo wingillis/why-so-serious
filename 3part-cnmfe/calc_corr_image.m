@@ -1,4 +1,4 @@
-function calc_corr_image(nam, options)
+function [Cn, pnr]=calc_corr_image(nam, options)
   % balance number of frames to read against the image dimensions (d1 x d2) to
   % limit RAM footprint
   % get the filename
@@ -59,5 +59,7 @@ function calc_corr_image(nam, options)
   if ~exist(dir_neurons, 'dir')
     mkdir(dir_neurons);
   end
-  saveas(gcf, fullfile(p, dir_neurons, 'correlation.png'), 'png');
+  if options.save_corr_img
+    saveas(gcf, fullfile(p, dir_neurons, 'correlation.png'), 'png');
+  end
 end % function

@@ -28,8 +28,10 @@ function part3_recomputing(fname)
   %% display contours of the neurons
   neuron.Coor = neuron.get_contours(0.8); % energy within the contour is 80% of the total
 
+  raw = strrep(fname, '_processed', '');
+  [Cn, pnr] = calc_corr_image(raw, options);
   % plot contours with IDs
-  figure;
+  figure();
   Cn = imresize(Cn, [d1, d2]);
   plot_contours(neuron.A, Cn, 0.8, 0, [], neuron.Coor, 2);
   colormap winter;
@@ -42,5 +44,5 @@ function part3_recomputing(fname)
 
   %% save results
   processed_path = fullfile(dir_nm, [file_nm '_results.mat']);
-  save(processed_path, '-v7.3');
+  save(processed_path, 'neuron', 'd1', 'd2', 'numFrame', 'options', 'Fs', '-v7.3')
 end % function
