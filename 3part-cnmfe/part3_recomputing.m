@@ -13,7 +13,8 @@ function part3_recomputing(fname)
 
   %% display neurons
   [dir_nm, file_nm, file_type] = fileparts(fname);
-  dir_neurons = fullfile(dir_nm, [file_nm '_neurons']);
+  raw = strrep(file_nm, '_processed', '');
+  dir_neurons = fullfile(dir_nm, [raw '_neurons']);
   if exist(dir_neurons, 'dir') == 7
       temp = cd();
       cd(dir_neurons);
@@ -28,7 +29,6 @@ function part3_recomputing(fname)
   %% display contours of the neurons
   neuron.Coor = neuron.get_contours(0.8); % energy within the contour is 80% of the total
 
-  raw = strrep(fname, '_processed', '');
   [Cn, pnr] = calc_corr_image(raw, options);
   % plot contours with IDs
   figure();
@@ -43,6 +43,6 @@ function part3_recomputing(fname)
   clear merge_thr;
 
   %% save results
-  processed_path = fullfile(dir_nm, [file_nm '_results.mat']);
+  processed_path = fullfile(dir_nm, [raw '_results.mat']);
   save(processed_path, 'neuron', 'd1', 'd2', 'numFrame', 'options', 'Fs', '-v7.3')
 end % function
