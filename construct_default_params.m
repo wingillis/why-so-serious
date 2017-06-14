@@ -70,4 +70,8 @@ function [options] = construct_default_options(options)
     options.save_corr_img = false;
   end
 
+  if ~isfield(options, 'view_neurons')
+    options.view_neurons = true;
+  end
+
 end % function
