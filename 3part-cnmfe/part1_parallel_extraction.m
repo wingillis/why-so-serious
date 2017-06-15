@@ -3,8 +3,6 @@ function [processed_path]=part1_parallel_extraction(nam, options)
   % will be going on - hopefully reducing the factor of time spent extracting
   % by a factor of 50
 
-  % configure the cluster
-  configCluster;
   % instantiate a cluster
   c = instantiate_cluster();
 
