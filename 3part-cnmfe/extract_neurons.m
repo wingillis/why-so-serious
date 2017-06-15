@@ -14,8 +14,7 @@ function [results]=extract_neurons(neuron, Y, options)
 
   % when using 2x downsampled data, cells are about 2-3 pixels large
   min_pixel = 3;      % minimum number of nonzero pixels for each neuron
-  bd = 0;             % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
-  neuron_patch.updateParams('min_pixel', min_pixel, 'bd', bd);
+  neuron.updateParams('min_pixel', min_pixel, 'bd', options.bd);
 
   % not found in CNMFESetParms script - don't know if it will work in
   % neuron_patch.updateParams

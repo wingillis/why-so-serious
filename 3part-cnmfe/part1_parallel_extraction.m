@@ -72,6 +72,7 @@ function [processed_path]=part1_parallel_extraction(nam, options)
   sframe=options.start_frame;						% user input: first frame to read (optional, default:1)
 
   RESULTS(length(patches)) = struct();
+  jobs(length(patches)) = cell();
 
   %%  PARALLEL CNMF_E
 
@@ -79,10 +80,9 @@ function [processed_path]=part1_parallel_extraction(nam, options)
   for i = 1:length(patches)
 
     % shape a new neuron to handle each patch and send it to mpi node
-    fprintf('On patch %d\n', i);
+    fprintf('Sending patch %d\n', i);
 
     % Load data from individual (i-th) patch and store in temporary Sources2D() object ('neuron_patch')
-
     neuron_patch = neuron_full.copy();
 
     % get movie data relevant to this chunk
@@ -105,6 +105,8 @@ function [processed_path]=part1_parallel_extraction(nam, options)
 
     neuron_patch.updateParams('d1', d1p, 'd2', d2p);
     Y = neuron_patch.reshape(Y, 1);  % convert a 3D video into a 2D matrix
+
+    jobs{i} = c.batch(@extract_neurons, 1, {neuron_patch, Y, options});
 
   end
 end % function
