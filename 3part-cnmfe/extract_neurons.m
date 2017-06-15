@@ -1,4 +1,4 @@
-function [results]=extract_neurons(neuron, options)
+function [results]=extract_neurons(neuron, Y, options)
   %% uses cnmfe to extract neurons from grin lens imaging data
   % neuron = Sources2D object
   % options = struct produced with `construct_default_params`

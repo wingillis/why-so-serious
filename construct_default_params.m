@@ -74,4 +74,12 @@ function [options] = construct_default_params(options)
     options.view_neurons = true;
   end
 
+  if ~isfield(options, 'start_frame')
+    options.start_frame = 1;
+  end
+
+  if ~isfield(options, 'num_frames')
+    options.num_frames = -1;
+  end
+
 end % function

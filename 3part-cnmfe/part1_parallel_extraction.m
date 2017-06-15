@@ -3,8 +3,12 @@ function [processed_path]=part1_parallel_extraction(nam, options)
   % will be going on - hopefully reducing the factor of time spent extracting
   % by a factor of 50
 
-  % load in the data, get the patches for each img subset
+  % configure the cluster
+  configCluster;
+  % instantiate a cluster
+  c = instantiate_cluster();
 
+  % load in the data, get the patches for each img subset
   if nargin < 2
     options = struct();
   end
@@ -25,16 +29,22 @@ function [processed_path]=part1_parallel_extraction(nam, options)
   end
   d1 = Ysiz(1);   %height
   d2 = Ysiz(2);   %width
-  numFrame = Ysiz(3);    %total number of frames
+  if options.num_frames == -1
+    numFrame = Ysiz(3);    %total number of frames
+  else
+    warning('Number of frames specified is probably not the same as the entire length of the movie');
+    numFrame = options.num_frames;
+  end
 
   %% create indices for splitting field-of-view into spatially overlapping patches (for parallel processing)
   patches = construct_patches([d1 d2], options.patch_sz, ...
                               options.overlap, options.min_patch);
 
   %% create Source2D class object for storing results and parameters
-  Fs = 30;            % frame rate
+  Fs = 30;     % frame rate
   neuron_full = make_cnmfe_class(d1, d2, Fs, options);
 
+  % TODO: deal with this at a later date: right now not using it at all
   % with dendrites or not
   if options.dendrites
       % determine the search locations by dilating the current neuron shapes
@@ -54,58 +64,49 @@ function [processed_path]=part1_parallel_extraction(nam, options)
       'optimize_smin', true);  % optimize the threshold
 
 
-  %% load small portion of data for displaying correlation image
+  %% display correlation image
   if options.save_corr_img
     calc_corr_image(nam, options);
   end
 
-
   %% Load and run CNMF_E on full dataset in patches
 
-  sframe=1;						% user input: first frame to read (optional, default:1)
-  num2read = numFrame;             % user input: how many frames to read (optional, default: until the end)
-  % time to test some stuff
-  % num2read = 1000;
-  if num2read ~= numFrame
-    warning('Only reading a subset of frames: change this for full analysis');
-  end
+  sframe=options.start_frame;						% user input: first frame to read (optional, default:1)
 
   RESULTS(length(patches)) = struct();
 
   %%  PARALLEL CNMF_E
-  % If you change main loop to a for loop (sequential processing), you can save space by condensing many of the
-  % steps below into scripts, as is done in the original demo_endoscope.m
 
   disp('Going through the patches');
-  % for i = 1:length(patches)
+  for i = 1:length(patches)
 
-  % shape a new neuron to handle each patch and send it to mpi node
-  fprintf('On patch %d\n', i);
+    % shape a new neuron to handle each patch and send it to mpi node
+    fprintf('On patch %d\n', i);
 
-  % Load data from individual (i-th) patch and store in temporary Sources2D() object ('neuron_patch')
+    % Load data from individual (i-th) patch and store in temporary Sources2D() object ('neuron_patch')
 
-  neuron_patch = neuron_full.copy();
+    neuron_patch = neuron_full.copy();
 
-  % get movie data relevant to this chunk
-  if and(options.ds_space==1, options.ds_time==1)
-    % temporal info is the same, but spatial info is now in chunks
-    % TODO: maybe turn this into single?
-    Y = data.Y(patches{i}(1):patches{i}(2), ...
-                      patches{i}(3):patches{i}(4), ...
-                      (sframe-1)+(1:num2read));
-    Y = double(Y);
-    [d1p, d2p, T] = size(Y);
-  else
-    Yraw = data.Y(patches{i}(1):patches{i}(2), ...
-                  patches{i}(3):patches{i}(4), ...
-                  (sframe-1)+(1:num2read));
-    [neuron_patch_ds, Y] = neuron_patch.downSample(double(Yraw));
-    [d1p, d2p, T] = size(Y);
-    neuron_patch = neuron_patch_ds.copy();
-    clear neuron_patch_ds;
+    % get movie data relevant to this chunk
+    if and(options.ds_space==1, options.ds_time==1)
+      % temporal info is the same, but spatial info is now in chunks
+      Y = data.Y(patches{i}(1):patches{i}(2), ...
+                        patches{i}(3):patches{i}(4), ...
+                        (sframe-1)+(1:numFrame));
+      Y = double(Y);
+      [d1p, d2p, T] = size(Y);
+    else
+      Yraw = data.Y(patches{i}(1):patches{i}(2), ...
+                    patches{i}(3):patches{i}(4), ...
+                    (sframe-1)+(1:numFrame));
+      [neuron_patch_ds, Y] = neuron_patch.downSample(double(Yraw));
+      [d1p, d2p, T] = size(Y);
+      neuron_patch = neuron_patch_ds.copy();
+      clear neuron_patch_ds;
+    end
+
+    neuron_patch.updateParams('d1', d1p, 'd2', d2p);
+    Y = neuron_patch.reshape(Y, 1);  % convert a 3D video into a 2D matrix
+
   end
-
-  neuron_patch.updateParams('d1', d1p, 'd2', d2p);
-  Y = neuron_patch.reshape(Y, 1);  % convert a 3D video into a 2D matrix
-
 end % function
