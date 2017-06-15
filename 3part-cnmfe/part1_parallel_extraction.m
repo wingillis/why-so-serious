@@ -111,6 +111,7 @@ function [processed_path]=part1_parallel_extraction(nam, options)
 
     jobs{i} = createJob(c, 'AdditionalPaths', additional_files);
     createTask(jobs{i}, @extract_neurons, 1, {neuron_patch, Y, options});
+    submit(jobs{i});
 
   end
 
