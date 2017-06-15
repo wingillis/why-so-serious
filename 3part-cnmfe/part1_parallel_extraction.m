@@ -20,7 +20,7 @@ function [processed_path]=part1_parallel_extraction(nam, options)
   data = matfile(nam);
   % the size variable name could vary - this naming scheme is from
   % the memmap_file.m script in cnmfe. Conditional should fix any errors
-  if isempty(whos(mf, 'sizY'))
+  if isempty(whos(data, 'sizY'))
     Ysiz = data.Ysiz;
   else
     Ysiz = data.sizY;
@@ -72,7 +72,7 @@ function [processed_path]=part1_parallel_extraction(nam, options)
   sframe=options.start_frame;						% user input: first frame to read (optional, default:1)
 
   RESULTS(length(patches)) = struct();
-  jobs(length(patches)) = cell();
+  jobs = cell(length(patches), 1);
 
   %%  PARALLEL CNMF_E
 
@@ -107,6 +107,7 @@ function [processed_path]=part1_parallel_extraction(nam, options)
     Y = neuron_patch.reshape(Y, 1);  % convert a 3D video into a 2D matrix
 
     jobs{i} = c.batch(@extract_neurons, 1, {neuron_patch, Y, options});
+    %jobs{i} = extract_neurons(neuron_patch, Y, options);
 
   end
 
