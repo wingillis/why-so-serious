@@ -1,7 +1,7 @@
 function part3_recomputing(fname)
   load(fname);
   %% merge neurons
-  display_merge = true; % set to true if you want to inspect every candidate merge
+  display_merge = false; % set to true if you want to inspect every candidate merge
   view_neurons = false; % set to true if you want to inspect all neurons after quick merge routine
 
   % have lower thresholds because it doesn't do a great job merging the same neuron

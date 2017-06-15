@@ -14,7 +14,7 @@ function [Cn, pnr]=calc_corr_image(nam, options)
   end
   d1 = ysiz(1);
   d2 = ysiz(2);
-  numFrames = ysiz(3);
+  numFrame = ysiz(3);
 
   neuron_full = make_cnmfe_class(d1, d2, Fs, options);
 
