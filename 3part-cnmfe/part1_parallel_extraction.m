@@ -4,7 +4,7 @@ function [processed_path]=part1_parallel_extraction(nam, options)
   % by a factor of 50
   cnmfe_files = strsplit(genpath('/home/wg41/code/CNMF_E'), ':');
   grin_files = strsplit(genpath('/home/wg41/code/grin-analysis'), ':');
-  additional_files = cat(2, cnmfe_files, grin_files);
+  additional_files = cat(2, cnmfe_files(1:end-1), grin_files(1:end-1));
 
   % instantiate a cluster
   c = instantiate_cluster();
