@@ -2,6 +2,9 @@ function [processed_path]=part1_parallel_extraction(nam, options)
   %% This function controls the deployment of all the parallel extractions that
   % will be going on - hopefully reducing the factor of time spent extracting
   % by a factor of 50
+  cnmfe_files = strsplit(genpath('/home/wg41/code/CNMF_E'), ':');
+  grin_files = strsplit(genpath('/home/wg41/code/grin-analysis'), ':');
+  additional_files = {cnmfe_files grin_files};
 
   % instantiate a cluster
   c = instantiate_cluster();
@@ -106,8 +109,8 @@ function [processed_path]=part1_parallel_extraction(nam, options)
     neuron_patch.updateParams('d1', d1p, 'd2', d2p);
     Y = neuron_patch.reshape(Y, 1);  % convert a 3D video into a 2D matrix
 
-    jobs{i} = c.batch(@extract_neurons, 1, {neuron_patch, Y, options});
-    %jobs{i} = extract_neurons(neuron_patch, Y, options);
+    jobs{i} = createJob(c, 'AdditionalPaths', additional_files);
+    createTask(jobs{i}, @extract_neurons, 1, {neuron_patch, Y, options});
 
   end
 
