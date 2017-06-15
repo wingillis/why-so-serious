@@ -7,7 +7,11 @@ function [Cn, pnr]=calc_corr_image(nam, options)
   Fs = 30;
 
   data = matfile(nam);
-  ysiz = data.sizY;
+  if isempty(whos(data, 'sizY'))
+    ysiz = data.Ysiz;
+  else
+    ysiz = data.sizY;
+  end
   d1 = ysiz(1);
   d2 = ysiz(2);
   numFrames = ysiz(3);
