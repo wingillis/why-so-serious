@@ -1,4 +1,4 @@
-function [options] = construct_default_options(options)
+function [options] = construct_default_params(options)
 
   if nargin < 1
     options = struct();

@@ -1,4 +1,4 @@
-function neuron=make_neuron(d1, d2, fs, options)
+function neuron = make_cnmfe_class(d1, d2, fs, options)
   neuron = Sources2D('d1', d1, 'd2', d2, ... % dimensions of datasets
     'ssub', options.ds_space, ...
     'tsub', options.ds_time, ...  % downsampling
