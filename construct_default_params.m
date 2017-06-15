@@ -1,4 +1,4 @@
-function [options] = construct_default_options(options)
+function [options] = construct_default_params(options)
 
   if nargin < 1
     options = struct();
@@ -72,6 +72,14 @@ function [options] = construct_default_options(options)
 
   if ~isfield(options, 'view_neurons')
     options.view_neurons = true;
+  end
+
+  if ~isfield(options, 'start_frame')
+    options.start_frame = 1;
+  end
+
+  if ~isfield(options, 'num_frames')
+    options.num_frames = -1;
   end
 
 end % function
