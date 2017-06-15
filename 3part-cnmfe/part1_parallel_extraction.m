@@ -117,5 +117,40 @@ function [processed_path]=part1_parallel_extraction(nam, options)
   end
 
   % ok, jobs are done, let's fetch the results
+  for i=1:length(jobs)
+    r = fetchOutputs(jobs{i});
+    r = r{1};
+    RESULTS(i).A = r.A;
+    RESULTS(i).C = r.C;
+    RESULTS(i).C_raw = r.C_raw;
+    RESULTS(i).S = r.S;
+    RESULTS(i).P = r.P;
+  end
+
+
+  neuron_full.P.kernel_pars = [];
+  for i = 1:length(patches)
+    if size(RESULTS(i).A,2)>0
+      Atemp = zeros(neuron_full.options.d1,neuron_full.options.d2,size(RESULTS(i).A,2));
+
+      for k = 1:size(RESULTS(i).A,2)
+        Atemp(patches{i}(1):patches{i}(2), patches{i}(3):patches{i}(4), k) =  reshape(RESULTS(i).A(:, k), patches{i}(2)-patches{i}(1)+1, patches{i}(4)-patches{i}(3)+1);
+      end
+
+      neuron_full.A = [neuron_full.A, reshape(Atemp,d1*d2,k)];
+      neuron_full.C = [neuron_full.C; RESULTS(i).C];
+      neuron_full.C_raw = [neuron_full.C_raw; RESULTS(i).C_raw];
+      neuron_full.S = [neuron_full.S; RESULTS(i).S];
+      neuron_full.P.sn = [neuron_full.P.sn, RESULTS(i).P.sn];
+      neuron_full.P.kernel_pars = [neuron_full.P.kernel_pars; RESULTS(i).P.kernel_pars];
+    end
+      clear Atemp;
+  end
+
+  neuron = neuron_full.copy();
+
+  % save what we have done here
+  processed_path = fullfile(dir_nm, [file_nm '_unprocessed.mat']);
+  save(processed_path, 'neuron', 'd1', 'd2', 'numFrame', 'options', 'Fs', 'Ysiz', '-v7.3');
 
 end % function
