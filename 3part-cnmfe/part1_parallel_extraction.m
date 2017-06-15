@@ -17,7 +17,7 @@ function [processed_path]=part1_parallel_extraction(nam, options)
   [dir_nm, file_nm, ~] = fileparts(nam);
   data = matfile(nam);
   % the size variable name could vary - this naming scheme is from
-  % the memmap_file.m script in cnmfe
+  % the memmap_file.m script in cnmfe. Conditional should fix any errors
   if isempty(whos(mf, 'sizY'))
     Ysiz = data.Ysiz;
   else
@@ -30,18 +30,6 @@ function [processed_path]=part1_parallel_extraction(nam, options)
   %% create indices for splitting field-of-view into spatially overlapping patches (for parallel processing)
   patches = construct_patches([d1 d2], options.patch_sz, ...
                               options.overlap, options.min_patch);
-
-  % TODO: make sure these are mapped properly
-  % global  d1 d2 numFrame ssub tsub sframe num2read Fs neuron neuron_ds ...
-  %    neuron_full; %#ok<NUSED> % global variables, don't change them manually
-
-
-  dir_neurons = fullfile(dir_nm, [file_nm '_neurons']);
-  if exist(dir_neurons, 'dir') == 7
-      % do nothing - use it to save neurons
-  else
-      mkdir(dir_neurons);
-  end
 
   %% create Source2D class object for storing results and parameters
   Fs = 30;            % frame rate
