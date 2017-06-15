@@ -109,4 +109,13 @@ function [processed_path]=part1_parallel_extraction(nam, options)
     jobs{i} = c.batch(@extract_neurons, 1, {neuron_patch, Y, options});
 
   end
+
+  % after all jobs are sent, wait for the data to come back, and aggregate
+  for i=1:length(jobs)
+    wait(jobs{i});
+    fprintf('Finished processing patch # %d of %d.\n', i, length(patches));
+  end
+
+  % ok, jobs are done, let's fetch the results
+
 end % function
