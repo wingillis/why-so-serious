@@ -95,13 +95,13 @@ function [processed_path]=part1_parallel_extraction(nam, options)
                         patches{i}(3):patches{i}(4), ...
                         (sframe-1)+(1:numFrame));
       Y = double(Y);
-      [d1p, d2p, T] = size(Y);
+      [d1p, d2p, ~] = size(Y);
     else
       Yraw = data.Y(patches{i}(1):patches{i}(2), ...
                     patches{i}(3):patches{i}(4), ...
                     (sframe-1)+(1:numFrame));
       [neuron_patch_ds, Y] = neuron_patch.downSample(double(Yraw));
-      [d1p, d2p, T] = size(Y);
+      [d1p, d2p, ~] = size(Y);
       neuron_patch = neuron_patch_ds.copy();
       clear neuron_patch_ds;
     end
