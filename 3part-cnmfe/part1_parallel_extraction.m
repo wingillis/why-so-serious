@@ -119,6 +119,7 @@ function [processed_path]=part1_parallel_extraction(nam, options)
 
   end
 
+  fprintf('Waiting for jobs to finish...\n');
   % after all jobs are sent, wait for the data to come back, and aggregate
   for i=1:length(jobs)
     wait(jobs{i});
