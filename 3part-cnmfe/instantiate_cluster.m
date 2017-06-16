@@ -1,6 +1,8 @@
 function [c]=instantiate_cluster(options)
   % needed to run things through O2
-  configCluster();
+  if ~any(strcmp(parallel.clusterProfiles, 'o2 local R2016b'))
+    configCluster();
+  end
   % condition for our queue - configure thru your config file
   ClusterInfo.setQueueName(options.cluster.queue);
   ClusterInfo.setWallTime(options.cluster.wall_time);
