@@ -81,7 +81,9 @@ function [processed_path]=part1_parallel_extraction(nam, options)
   %%  PARALLEL CNMF_E
   start_batch = tic();
 
-  disp('Going through the patches');
+  fprintf('Going through %d patches\n', length(patches));
+  
+  % go thru each patch and send that shit
   for i = 1:length(patches)
 
     % shape a new neuron to handle each patch and send it to mpi node
