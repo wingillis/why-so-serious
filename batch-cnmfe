@@ -9,4 +9,4 @@
 module load matlab/2016b
 cnmfepath="${HOME}/code/CNMF_E"
 grinpath="${HOME}/code/grin-analysis"
-matlab -r "addpath(genpath('${cnmfepath}')); addpath(genpath('${grinpath}')); batch_cnmfe('$1');"
+matlab -r "addpath(genpath('${grinpath}')); addpath(genpath('${cnmfepath}')); batch_cnmfe('$1');"
