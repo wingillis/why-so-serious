@@ -30,6 +30,7 @@ function batch_cnmfe(data_path, config_path)
     else
       warning('No config file found anywhere: will populate an options file with default parameters');
       options = struct();
+    end
 
   else
     options = read_cnmfe_params(config_path);
