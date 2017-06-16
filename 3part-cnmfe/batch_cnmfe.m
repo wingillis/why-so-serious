@@ -8,9 +8,10 @@ function batch_cnmfe(data_path, config_path)
     [exp_dir, ~, ~] = fileparts(data_path);
     home_dir = getenv('HOME');
     [grin_dir, ~, ~] = fileparts(which('part1_parallel_extraction'));
-    exp_config = dir(fullfile(exp_dir, '*cnmfe*.config'));
-    home_config = dir(fullfile(home_dir, '*cnmfe*.config'));
-    grin_config = dir(fullfile(grin_dir, '*cnmfe*.config'));
+    conf_glob = '*cnmfe*.config';
+    exp_config = dir(fullfile(exp_dir, conf_glob));
+    home_config = dir(fullfile(home_dir, conf_glob));
+    grin_config = dir(fullfile(grin_dir, conf_glob));
     if ~isempty(exp_config)
       epath = exp_config(1);
       epath = fullfile(epath.folder, epath.name);
@@ -35,9 +36,12 @@ function batch_cnmfe(data_path, config_path)
   end
 
   % to fill in any values not already added in the config file
-  options = construct_default_params(options);
+  new_options = construct_default_params(options);
+  if ~isequal(options, new_options)
+    fprintf('New parameters were added to options file\n');
+  end
 
-  processed_path = part1_parallel_extraction(data_path, options);
-  fprintf('Unprocessed file saved: %s\n', processed_path)
+  processed_path = part1_parallel_extraction(data_path, new_options);
+  fprintf('Unprocessed file saved: %s\n', processed_path);
 
 end % function

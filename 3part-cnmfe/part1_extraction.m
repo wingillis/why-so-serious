@@ -28,8 +28,8 @@ d2 = Ysiz(2);   %width
 numFrame = Ysiz(3);    %total number of frames
 
 %% create indices for splitting field-of-view into spatially overlapping patches (for parallel processing)
-patches = construct_patches([d1 d2], options.patch_sz, ...
-                            options.overlap, options.min_patch);
+patches = construct_patches([d1 d2], options.cnmfe.patch_sz, ...
+                            options.cnmfe.overlap, options.cnmfe.min_patch);
 
 % TODO: make sure these are mapped properly
 % global  d1 d2 numFrame ssub tsub sframe num2read Fs neuron neuron_ds ...
@@ -45,10 +45,10 @@ end
 
 %% create Source2D class object for storing results and parameters
 Fs = 30;            % frame rate
-neuron_full = make_cnmfe_class(d1, d2, Fs, options);
+neuron_full = make_cnmfe_class(d1, d2, Fs, options.cnmfe);
 
 % with dendrites or not
-if options.dendrites
+if options.cnmfe.dendrites
     % determine the search locations by dilating the current neuron shapes
     neuron_full.options.search_method = 'dilate';
     neuron_full.options.bSiz = 20;
@@ -67,7 +67,7 @@ neuron_full.options.deconv_options = struct('type', 'ar1', ... % model of the ca
 
 
 %% load small portion of data for displaying correlation image
-if options.save_corr_img
+if options.cnmfe.save_corr_img
   calc_corr_image(nam, options);
 end
 
@@ -98,7 +98,7 @@ for i = 1:length(patches)
   neuron_patch = neuron_full.copy();
 
   % get movie data relevant to this chunk
-  if and(options.ds_space==1, options.ds_time==1)
+  if and(options.cnmfe.ds_space==1, options.cnmfe.ds_time==1)
     % temporal info is the same, but spatial info is now in chunks
     % TODO: maybe turn this into single?
     Y = data.Y(patches{i}(1):patches{i}(2), ...
@@ -140,7 +140,7 @@ for i = 1:length(patches)
   fprintf('Initialization of endoscope\n')
 
   % greedy method for initialization
-  neuron_patch.initComponents_endoscope(Y, options.max_neurons, ...
+  neuron_patch.initComponents_endoscope(Y, options.cnmfe.max_neurons, ...
                                         patch_par, debug_on, save_avi);
 
   %% iteratively update A, C and B
@@ -187,7 +187,7 @@ for i = 1:length(patches)
         % corresponding to {sptial overlaps, temporal correlation of C,
         %temporal correlation of S}
       else
-        merge_thr = [options.spatial_corr options.temporal_corr options.spiketime_corr];
+        merge_thr = [options.cnmfe.spatial_corr options.cnmfe.temporal_corr options.cnmfe.spiketime_corr];
       end
 
       % merge neurons

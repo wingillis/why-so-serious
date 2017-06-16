@@ -1,7 +1,6 @@
 function OPTIONS=read_cnmfe_params(FILENAME)
 % script for reading config files/sorting for processing/chopping
-%
-% takes logfile as input
+% takes config file as input
 %
 %
 %
@@ -44,7 +43,6 @@ for ii=1:length(section_headers)
     if read_start
 
       insert_data=readdata{2}{i};
-      insert_data=regexprep(insert_data,'''','');
       %insert_data=regexprep(insert_data,'''$','');
 
       OPTIONS.(section_headers{ii}).(readdata{1}{i})=insert_data;
@@ -62,9 +60,14 @@ for ii=1:length(section_headers)
 
       tmp=regexpi(OPTIONS.(section_headers{ii}).(readdata{1}{i}),'^[0-9;.:e-]+$|([e|E]ps)|(true)|(false)','match');
       tmp2=regexpi(OPTIONS.(section_headers{ii}).(readdata{1}{i}),'^\[([0-9;.:e-]+|([0-9;.:e-]+ )+[0-9;.:e-]+)\]|([i|I]nf)|(\[\])$','match');
+      % tmp3=regexpi(OPTIONS.(section_headers{ii}).(readdata{1}{i}), '''(.*?)''');
 
+      % if ((~isempty(tmp) | ~isempty(tmp2)) & isempty(tmp3))
       if (~isempty(tmp) | ~isempty(tmp2))
         OPTIONS.(section_headers{ii}).(readdata{1}{i})=str2num(OPTIONS.(section_headers{ii}).(readdata{1}{i}));
+      elseif ~isempty(regexpi(insert_data, '''(.*?)''', 'match'))
+        insert_data=regexprep(insert_data,'''','');
+        OPTIONS.(section_headers{ii}).(readdata{1}{i})=insert_data;
       end
 
     end

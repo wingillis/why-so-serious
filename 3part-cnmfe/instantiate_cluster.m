@@ -1,11 +1,13 @@
-function [c]=instantiate_cluster()
-  % TODO: make this configurable by the user
+function [c]=instantiate_cluster(options)
+  % needed to run things through O2
   configCluster();
-  ClusterInfo.setQueueName('mpi');
-  ClusterInfo.setWallTime('24:00:00');
-  ClusterInfo.setMemUsage('25G');
-  ClusterInfo.setUserNameOnCluster('wg41');
-  ClusterInfo.setEmailAddress('wgillis@g.harvard.edu');
-  ClusterInfo.setUserDefinedOptions('--mail-type=END');
+  % condition for our queue - configure thru your config file
+  ClusterInfo.setQueueName(options.cluster.queue);
+  ClusterInfo.setWallTime(options.cluster.wall_time);
+  ClusterInfo.setMemUsage(options.cluster.mem);
+  ClusterInfo.setUserNameOnCluster(options.cluster.username);
+  ClusterInfo.setEmailAddress(options.cluster.email);
+  ClusterInfo.setUserDefinedOptions(options.cluster.user_defined_opts);
+  % create the cluster object
   c = parcluster();
 end
