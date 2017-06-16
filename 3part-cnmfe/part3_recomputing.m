@@ -29,7 +29,7 @@ function part3_recomputing(fname)
   %% display contours of the neurons
   neuron.Coor = neuron.get_contours(0.8); % energy within the contour is 80% of the total
 
-  [Cn, pnr] = calc_corr_image(raw, options);
+  [Cn, pnr] = calc_corr_image([raw '.mat'], options);
   % plot contours with IDs
   figure();
   Cn = imresize(Cn, [d1, d2]);
