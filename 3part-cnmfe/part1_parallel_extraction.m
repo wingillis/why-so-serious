@@ -2,20 +2,21 @@ function [processed_path]=part1_parallel_extraction(nam, options)
   %% This function controls the deployment of all the parallel extractions that
   % will be going on - hopefully reducing the factor of time spent extracting
   % by a factor of 50
-  cnmfe_files = strsplit(genpath('/home/wg41/code/CNMF_E'), ':');
-  grin_files = strsplit(genpath('/home/wg41/code/grin-analysis'), ':');
+
+
+  % load in the data, get the patches for each img subset
+  %% end option construction
+  if nargin < 2
+    options = struct();
+    options = construct_default_params(options);
+  end
+
+  cnmfe_files = strsplit(genpath(options.cluster.cnmfe_code), ':');
+  grin_files = strsplit(genpath(options.cluster.grin_code), ':');
   additional_files = cat(2, cnmfe_files(1:end-1), grin_files(1:end-1));
 
   % instantiate a cluster
-  c = instantiate_cluster();
-
-  % load in the data, get the patches for each img subset
-  if nargin < 2
-    options = struct();
-  end
-
-  options = construct_default_params(options);
-  %% end option construction
+  c = instantiate_cluster(options);
 
   %% select data and map it to RAM
   % following info is from: cnmfe_choose_data;
@@ -78,13 +79,14 @@ function [processed_path]=part1_parallel_extraction(nam, options)
   jobs = cell(length(patches), 1);
 
   %%  PARALLEL CNMF_E
+  start_batch = tic();
 
   disp('Going through the patches');
   for i = 1:length(patches)
 
     % shape a new neuron to handle each patch and send it to mpi node
     fprintf('Sending patch %d\n', i);
-
+    t1 = tic();
     % Load data from individual (i-th) patch and store in temporary Sources2D() object ('neuron_patch')
     neuron_patch = neuron_full.copy();
 
@@ -112,6 +114,8 @@ function [processed_path]=part1_parallel_extraction(nam, options)
     jobs{i} = createJob(c, 'AdditionalPaths', additional_files);
     createTask(jobs{i}, @extract_neurons, 1, {neuron_patch, Y, options});
     submit(jobs{i});
+    time_elapsed=toc(t1);
+    fprintf('Time to submit job: %.2fs\n', time_elapsed)
 
   end
 
@@ -132,6 +136,8 @@ function [processed_path]=part1_parallel_extraction(nam, options)
     RESULTS(i).P = r.P;
   end
 
+  end_batch = toc(start_batch);
+  fprintf('Time elapsed for entire job to finish: %.2fs\n', end_batch);
 
   neuron_full.P.kernel_pars = [];
   for i = 1:length(patches)
