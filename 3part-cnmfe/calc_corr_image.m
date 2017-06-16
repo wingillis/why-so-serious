@@ -16,9 +16,9 @@ function [Cn, pnr]=calc_corr_image(nam, options)
   d2 = ysiz(2);
   numFrame = ysiz(3);
 
-  neuron_full = make_cnmfe_class(d1, d2, Fs, options);
+  neuron_full = make_cnmfe_class(d1, d2, Fs, options.cnmfe);
 
-  if and(options.ds_space==1, options.ds_time==1)
+  if and(options.cnmfe.ds_space==1, options.cnmfe.ds_time==1)
       disp('Loading neuron subset')
       neuron_small = neuron_full;
       Y = double(data.Y(:, :, sframe+(1:num2read)-1));
@@ -63,7 +63,7 @@ function [Cn, pnr]=calc_corr_image(nam, options)
   if ~exist(dir_neurons, 'dir')
     mkdir(dir_neurons);
   end
-  if options.save_corr_img
+  if options.cnmfe.save_corr_img
     saveas(gcf, fullfile(p, dir_neurons, 'correlation.png'), 'png');
   end
 end % function

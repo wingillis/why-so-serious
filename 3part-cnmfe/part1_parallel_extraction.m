@@ -30,24 +30,24 @@ function [processed_path]=part1_parallel_extraction(nam, options)
   end
   d1 = Ysiz(1);   %height
   d2 = Ysiz(2);   %width
-  if options.num_frames == -1
+  if options.cnmfe.num_frames == -1
     numFrame = Ysiz(3);    %total number of frames
   else
     warning('Number of frames specified is probably not the same as the entire length of the movie');
-    numFrame = options.num_frames;
+    numFrame = options.cnmfe.num_frames;
   end
 
   %% create indices for splitting field-of-view into spatially overlapping patches (for parallel processing)
-  patches = construct_patches([d1 d2], options.patch_sz, ...
-                              options.overlap, options.min_patch);
+  patches = construct_patches([d1 d2], options.cnmfe.patch_sz, ...
+                              options.cnmfe.overlap, options.cnmfe.min_patch);
 
   %% create Source2D class object for storing results and parameters
   Fs = 30;     % frame rate
-  neuron_full = make_cnmfe_class(d1, d2, Fs, options);
+  neuron_full = make_cnmfe_class(d1, d2, Fs, options.cnmfe);
 
   % TODO: deal with this at a later date: right now not using it at all
   % with dendrites or not
-  if options.dendrites
+  if options.cnmfe.dendrites
       % determine the search locations by dilating the current neuron shapes
       neuron_full.options.search_method = 'dilate';
       neuron_full.options.bSiz = 20;
@@ -66,13 +66,13 @@ function [processed_path]=part1_parallel_extraction(nam, options)
 
 
   %% display correlation image
-  if options.save_corr_img
+  if options.cnmfe.save_corr_img
     calc_corr_image(nam, options);
   end
 
   %% Load and run CNMF_E on full dataset in patches
 
-  sframe=options.start_frame;						% user input: first frame to read (optional, default:1)
+  sframe=options.cnmfe.start_frame;						% user input: first frame to read (optional, default:1)
 
   RESULTS(length(patches)) = struct();
   jobs = cell(length(patches), 1);
@@ -89,7 +89,7 @@ function [processed_path]=part1_parallel_extraction(nam, options)
     neuron_patch = neuron_full.copy();
 
     % get movie data relevant to this chunk
-    if and(options.ds_space==1, options.ds_time==1)
+    if and(options.cnmfe.ds_space==1, options.cnmfe.ds_time==1)
       % temporal info is the same, but spatial info is now in chunks
       Y = data.Y(patches{i}(1):patches{i}(2), ...
                         patches{i}(3):patches{i}(4), ...

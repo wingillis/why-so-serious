@@ -14,12 +14,12 @@ function [results]=extract_neurons(neuron, Y, options)
   save_avi = false;   % save the initialization procedure as an avi movie.
   patch_par = [1,1]*1; %1;  % divide the optical field into m X n patches and do initialization patch by patch. It can be used when the data is too large
   min_pixel = 4;      % minimum number of nonzero pixels for each neuron
-  neuron.updateParams('min_pixel', min_pixel, 'bd', options.bd);
+  neuron.updateParams('min_pixel', min_pixel, 'bd', options.cnmfe.bd);
 
   neuron.options.nk = 1;  % number of knots for detrending
   fprintf('Initialization of endoscope\n')
   % greedy method for initialization
-  neuron.initComponents_endoscope(Y, options.max_neurons, ...
+  neuron.initComponents_endoscope(Y, options.cnmfe.max_neurons, ...
                                         patch_par, debug_on, save_avi);
 
   %% iteratively update A, C and B
@@ -63,7 +63,7 @@ function [results]=extract_neurons(neuron, Y, options)
         % corresponding to {sptial overlaps, temporal correlation of C,
         %temporal correlation of S}
       else
-        merge_thr = [options.spatial_corr options.temporal_corr options.spiketime_corr];
+        merge_thr = [options.cnmfe.spatial_corr options.cnmfe.temporal_corr options.cnmfe.spiketime_corr];
       end
 
       % merge neurons

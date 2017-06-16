@@ -2,84 +2,87 @@ function [options] = construct_default_params(options)
 
   if nargin < 1
     options = struct();
+    options.cnmfe = struct();
   end
 
-  if ~isfield(options, 'patch_sz')
-    options.patch_sz = [64 64]; % rndm default for how large the patches are
+  if ~isfield(options.cnmfe, 'patch_sz')
+    options.cnmfe.patch_sz = [64 64]; % rndm default for how large the patches are
   end
 
-  if ~isfield(options, 'overlap')
-    options.overlap = [20 20]; % # pixels between chunks for overlap
+  if ~isfield(options.cnmfe, 'overlap')
+    options.cnmfe.overlap = [20 20]; % # pixels between chunks for overlap
   end
 
-  if ~isfield(options, 'min_patch')
-    options.min_patch = [16 16]; % minimum patch size in either direction
+  if ~isfield(options.cnmfe, 'min_patch')
+    options.cnmfe.min_patch = [16 16]; % minimum patch size in either direction
   end
 
-  if ~isfield(options, 'gauss_kernel')
+  if ~isfield(options.cnmfe, 'gauss_kernel')
     % width of the gaussian kernel, which can approximates the average neuron shape
-    options.gauss_kernel = 5;
+    options.cnmfe.gauss_kernel = 5;
   end
 
-  if ~isfield(options, 'neuron_dia')
+  if ~isfield(options.cnmfe, 'neuron_dia')
     % maximum diameter of neurons in the image plane. larger values are preferred
-    options.neuron_dia = 10;
+    options.cnmfe.neuron_dia = 10;
   end
 
-  if ~isfield(options, 'min_corr')
-    options.min_corr = 0.8;
+  if ~isfield(options.cnmfe, 'min_corr')
+    options.cnmfe.min_corr = 0.8;
   end
 
-  if ~isfield(options, 'ds_time')
-    options.ds_time = 5;
+  if ~isfield(options.cnmfe, 'ds_time')
+    options.cnmfe.ds_time = 1;
   end
 
-  if ~isfield(options, 'ds_space')
-    options.ds_space = 1;
+  if ~isfield(options.cnmfe, 'ds_space')
+    options.cnmfe.ds_space = 1;
   end
 
-  if ~isfield(options, 'min_pnr')
-    options.min_pnr = 20;
+  if ~isfield(options.cnmfe, 'min_pnr')
+    options.cnmfe.min_pnr = 20;
   end
 
-  if ~isfield(options, 'bd')
-    options.bd = 0;
+  if ~isfield(options.cnmfe, 'bd')
+    options.cnmfe.bd = 0;
   end
 
-  if ~isfield(options, 'dendrites')
-    options.dendrites = false;
+  if ~isfield(options.cnmfe, 'dendrites')
+    options.cnmfe.dendrites = false;
   end
 
-  if ~isfield(options, 'max_neurons')
-    options.max_neurons = []; % default searches for # neurons in sample
+  if ~isfield(options.cnmfe, 'max_neurons')
+    options.cnmfe.max_neurons = []; % default searches for # neurons in sample
   end
 
-  if ~isfield(options, 'spatial_corr')
-    options.spatial_corr = 0.6;
+  if ~isfield(options.cnmfe, 'spatial_corr')
+    options.cnmfe.spatial_corr = 0.6;
   end
 
-  if ~isfield(options, 'temporal_corr')
-    options.temporal_corr = 0.5;
+  if ~isfield(options.cnmfe, 'temporal_corr')
+    options.cnmfe.temporal_corr = 0.5;
   end
 
-  if ~isfield(options, 'spiketime_corr')
-    options.spiketime_corr = 0.1;
+  if ~isfield(options.cnmfe, 'spiketime_corr')
+    options.cnmfe.spiketime_corr = 0.1;
   end
 
-  if ~isfield(options, 'save_corr_img')
-    options.save_corr_img = false;
+  if ~isfield(options.cnmfe, 'save_corr_img')
+    options.cnmfe.save_corr_img = false;
   end
 
-  if ~isfield(options, 'view_neurons')
-    options.view_neurons = true;
+  if ~isfield(options.cnmfe, 'view_neurons')
+    options.cnmfe.view_neurons = true;
   end
 
-  if ~isfield(options, 'start_frame')
-    options.start_frame = 1;
+  if ~isfield(options.cnmfe, 'start_frame')
+    options.cnmfe.start_frame = 1;
   end
 
-  if ~isfield(options, 'num_frames')
-    options.num_frames = -1;
+  if ~isfield(options.cnmfe, 'num_frames')
+    options.cnmfe.num_frames = -1;
   end
+
+  % TODO: add default options for cluster profile
 
 end % function
