@@ -82,7 +82,7 @@ function [processed_path]=part1_parallel_extraction(nam, options)
   start_batch = tic();
 
   fprintf('Going through %d patches\n', length(patches));
-  
+
   % go thru each patch and send that shit
   for i = 1:length(patches)
 
