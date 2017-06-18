@@ -128,15 +128,23 @@ function [processed_path]=part1_parallel_extraction(nam, options)
     fprintf('Finished processing patch # %d of %d.\n', i, length(patches));
   end
 
+  toc(start_batch)
+
   % ok, jobs are done, let's fetch the results
   for i=1:length(jobs)
-    r = fetchOutputs(jobs{i});
-    r = r{1};
-    RESULTS(i).A = r.A;
-    RESULTS(i).C = r.C;
-    RESULTS(i).C_raw = r.C_raw;
-    RESULTS(i).S = r.S;
-    RESULTS(i).P = r.P;
+    try
+      r = fetchOutputs(jobs{i});
+      r = r{1};
+      RESULTS(i).A = r.A;
+      RESULTS(i).C = r.C;
+      RESULTS(i).C_raw = r.C_raw;
+      RESULTS(i).S = r.S;
+      RESULTS(i).P = r.P;
+      delete(jobs{i});
+    catch me
+      delete(jobs{i});
+      fprintf('Error in job %d, deleting associated files...\n', i);
+    end
   end
 
   end_batch = toc(start_batch);
