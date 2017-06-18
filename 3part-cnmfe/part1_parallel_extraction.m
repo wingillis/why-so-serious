@@ -82,7 +82,7 @@ function [processed_path]=part1_parallel_extraction(nam, options)
   start_batch = tic();
 
   fprintf('Going through %d patches\n', length(patches));
-  
+
   % go thru each patch and send that shit
   for i = 1:length(patches)
 
@@ -130,26 +130,21 @@ function [processed_path]=part1_parallel_extraction(nam, options)
 
   toc(start_batch)
 
-  for i=1:length(jobs)
-    if strcmp(jobs{i}.State, 'failed')
-      fprintf('Job %d failed\n', i);
-      disp(diary(jobs{i}));
-    end
-  end
-
   % ok, jobs are done, let's fetch the results
   for i=1:length(jobs)
-    while ~strcmp(jobs{i}.State, 'finished')
-      fprintf('Job %d not finished\n', i);
-      pause(30);
+    try
+      r = fetchOutputs(jobs{i});
+      r = r{1};
+      RESULTS(i).A = r.A;
+      RESULTS(i).C = r.C;
+      RESULTS(i).C_raw = r.C_raw;
+      RESULTS(i).S = r.S;
+      RESULTS(i).P = r.P;
+      delete(jobs{i});
+    catch me
+      delete(jobs{i});
+      fprintf('Error in job %d, deleting associated files...\n', i);
     end
-    r = fetchOutputs(jobs{i});
-    r = r{1};
-    RESULTS(i).A = r.A;
-    RESULTS(i).C = r.C;
-    RESULTS(i).C_raw = r.C_raw;
-    RESULTS(i).S = r.S;
-    RESULTS(i).P = r.P;
   end
 
   end_batch = toc(start_batch);
