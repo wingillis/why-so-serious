@@ -128,8 +128,21 @@ function [processed_path]=part1_parallel_extraction(nam, options)
     fprintf('Finished processing patch # %d of %d.\n', i, length(patches));
   end
 
+  toc(start_batch)
+
+  for i=1:length(jobs)
+    if strcmp(jobs{i}.State, 'failed')
+      fprintf('Job %d failed\n', i);
+      disp(diary(jobs{i}));
+    end
+  end
+
   % ok, jobs are done, let's fetch the results
   for i=1:length(jobs)
+    while ~strcmp(jobs{i}.State, 'finished')
+      fprintf('Job %d not finished\n', i);
+      pause(30);
+    end
     r = fetchOutputs(jobs{i});
     r = r{1};
     RESULTS(i).A = r.A;
