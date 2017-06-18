@@ -147,9 +147,6 @@ function [processed_path]=part1_parallel_extraction(nam, options)
     end
   end
 
-  fprintf('Deleting any associated jobs with cluster...\n');
-  delete(c.Jobs);
-
   end_batch = toc(start_batch);
   fprintf('Time elapsed for entire job to finish: %.2fs\n', end_batch);
 
