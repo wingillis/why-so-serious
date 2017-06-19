@@ -6,6 +6,9 @@
 #SBATCH --mail-type=END
 #SBATCH --mail-user=wgillis@g.harvard.edu
 
+# this script runs part 3 of the cnmfe algorithm
+# this is pretty quick (a couple mins) compared to the other parts
+
 module load matlab/2016b
 cnmfepath="${HOME}/code/CNMF_E"
 grinpath="${HOME}/code/grin-analysis"
