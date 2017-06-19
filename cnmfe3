@@ -1,0 +1,14 @@
+#!/bin/bash
+#SBATCH -n 1
+#SBATCH --mem=20G
+#SBATCH -p short
+#SBATCH -t 4:00:00
+#SBATCH --mail-type=END
+#SBATCH --mail-user=wgillis@g.harvard.edu
+
+module load matlab/2016b
+cnmfepath="${HOME}/code/CNMF_E"
+grinpath="${HOME}/code/grin-analysis"
+echo "$(pwd)"
+echo "Running for $1"
+matlab -r "addpath(genpath('${grinpath}')); addpath(genpath('${cnmfepath}')); part3_recomputing('$1');"
