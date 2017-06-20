@@ -3,7 +3,7 @@ function outfile=make_short_movie(filepath, nframes)
     nframes = 6000;
   end
   mf = matfile(filepath);
-  [fpath, fname, ext] = fileparts(filepath);
+  [fpath, fname, ~] = fileparts(filepath);
   outfile = matfile(fullfile(fpath, [fname '-short.mat']), 'Writable', true);
   sizY = mf.sizY;
   sizY(3) = nframes; % arbitrary # of frames for a smaller version
