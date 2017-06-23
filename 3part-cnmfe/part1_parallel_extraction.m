@@ -66,9 +66,10 @@ function [processed_path]=part1_parallel_extraction(nam, options)
       'optimize_smin', true);  % optimize the threshold
 
 
-  %% display correlation image
+  %% save correlation image
   if options.cnmfe.save_corr_img
-    calc_corr_image(nam, options);
+    [Cn, pnr] = calc_corr_image(nam, options);
+    neuron_full.Cn = Cn;
   end
 
   %% Load and run CNMF_E on full dataset in patches
