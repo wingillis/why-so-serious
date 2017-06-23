@@ -12,3 +12,4 @@ legend(cellfun(@(x) num2str(x), num2cell(thresholds), 'UniformOutput', false));
 xlabel('Frames btw changepoints')
 ylabel('Probability')
 title('Comparison of cp peaks with different thresholds')
+xlim([-3 50]);

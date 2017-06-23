@@ -1,5 +1,5 @@
 g.z_score_cells();
-g.find_active_cells(2); % 2x std of z-scored cells
+g.find_active_cells(6); % 2x std of z-scored cells
 figure();
 thresholds = [0 0.1 0.2 0.25 0.29 0.33 0.4];
 for i=1:length(thresholds)
@@ -8,13 +8,13 @@ for i=1:length(thresholds)
   vals = g.activity_cp_aligned;
   v = squeeze(sum(vals, 2));
   muv = mean(v, 1)';
-  muv = zscore(muv);
-  plot(muv, 'LineWidth', 2);
+  % muv = zscore(muv);
+  plot(muv, 'LineWidth', 1);
   hold on;
 end
 
 legend(cellfun(@(x) num2str(x), num2cell(thresholds), 'UniformOutput', false));
 xticklabels(linspace(-1, 1, 7));
 xlabel('Lag to onset of changepoint (s)')
-ylabel('Cell activity (z-scored)')
+ylabel('Cell activity')
 title('Cell activity aligned to changepoints; showing diff peak cp thresholds')
