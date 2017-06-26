@@ -30,8 +30,8 @@ function mat2contour(matname, cnmfename, outfile)
         a_contour = zeros(1,points);
         a_contour(1:2:points) = contours{k}(1,:);
         a_contour(2:2:points) = contours{k}(2,:);
-        gry = mat2gray(squeeze(double(y(:,:,j))), [mmin mmax]);
-        ycolor(:,:,:,j) = single(insertShape(gry(:,:, [1 1 1]), 'Line', a_contour, 'LineWidth', 1, 'Color', 'g'));
+        gry = mat2gray(squeeze(y(:,:,j)), single([mmin mmax]));
+        ycolor(:,:,:,j) = insertShape(gry(:,:, [1 1 1]), 'Line', a_contour, 'LineWidth', 1, 'Color', 'g');
       end
     end
     writeVideo(vid, ycolor);
