@@ -30,7 +30,7 @@ function mat2contour(matname, cnmfename, outfile)
         a_contour = zeros(1,points);
         a_contour(1:2:points) = contours{k}(1,:);
         a_contour(2:2:points) = contours{k}(2,:);
-        gry = mat2gray(squeeze(y(:,:,j)), single([mmin mmax]));
+        gry = mat2gray(squeeze(y(:,:,j)), double([mmin mmax]));
         ycolor(:,:,:,j) = insertShape(gry(:,:, [1 1 1]), 'Line', a_contour, 'LineWidth', 1, 'Color', 'g');
       end
     end
