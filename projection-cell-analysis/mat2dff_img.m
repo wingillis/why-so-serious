@@ -9,6 +9,7 @@ function mat2dff_img(matname, outfile)
   fivemin = 30 * 60 * 5;
   chunks = floor(siz(3)/fivemin);
   for i=1:chunks
+    fprintf('Running on chunk %d of %d\n', i, chunks);
     y = mf.Y(:, :, (i-1)*fivemin+1:i*fivemin);
 
     meanframe = meanframe + mean(y, 3) ./ chunks;
