@@ -15,6 +15,7 @@ function mat2contour(matname, cnmfename, outfile)
 
   for i=1:ceil(siz(3)/fivemin)
     % read in 5 minutes of data - should be around 2GB
+    disp(['Running on part ' i ' of ' ceil(siz(3)/fivemin)]);
     y = single(mf.Y(:, :, (i-1)*fivemin+1:i*fivemin));
     if mmin == 0
       mmin = prctile(y(:), 10);
@@ -29,8 +30,8 @@ function mat2contour(matname, cnmfename, outfile)
         a_contour = zeros(1,points);
         a_contour(1:2:points) = contours{k}(1,:);
         a_contour(2:2:points) = contours{k}(2,:);
-        gry = mat2gray(squeeze(y(:,:,j)), [mmin mmax]);
-        ycolor(:,:,:,j) = insertShape(gry(:,:, [1 1 1]), 'Line', a_contour, 'LineWidth', 1, 'Color', 'g');
+        gry = mat2gray(squeeze(double(y(:,:,j))), [mmin mmax]);
+        ycolor(:,:,:,j) = single(insertShape(gry(:,:, [1 1 1]), 'Line', a_contour, 'LineWidth', 1, 'Color', 'g'));
       end
     end
     writeVideo(vid, ycolor);
