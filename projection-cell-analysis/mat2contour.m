@@ -25,14 +25,16 @@ function mat2contour(matname, cnmfename, outfile)
     ycolor = permute(y, [1 2 4 3]);
     ycolor = ycolor(:, :, [1 1 1], :);
     for j=1:size(y, 3)
+      gry = mat2gray(squeeze(y(:,:,j)), double([mmin mmax]));
+      gry = gry(:, :, [1 1 1]);
       for k=1:length(contours)
         points = 2*size(contours{k}, 2);
         a_contour = zeros(1,points);
         a_contour(1:2:points) = contours{k}(1,:);
         a_contour(2:2:points) = contours{k}(2,:);
-        gry = mat2gray(squeeze(y(:,:,j)), double([mmin mmax]));
-        ycolor(:,:,:,j) = insertShape(gry(:,:, [1 1 1]), 'Line', a_contour, 'LineWidth', 1, 'Color', 'g');
+        gry = insertShape(gry, 'Line', a_contour, 'LineWidth', 1, 'Color', 'g');
       end
+      ycolor(:,:,:,j) = gry;
     end
     writeVideo(vid, ycolor);
   end
