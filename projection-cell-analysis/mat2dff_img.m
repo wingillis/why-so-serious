@@ -17,7 +17,10 @@ function mat2dff_img(matname, outfile)
 
   end
 
-  img = (maxframe - meanframe) ./ meanframe;
+  img = (double(maxframe) - meanframe) ./ meanframe;
+  ptile = @(x) [prctile(x(:), 0.5) prctile(x(:), 99.5)];
 
-  imwrite(img, fullfile(basename, [outfile '.png']), 'png');
+  imwrite(mat2gray(img, ptile(img)), fullfile(basename, [outfile '-dff.png']), 'png');
+  imwrite(mat2gray(double(maxframe), ptile(double(maxframe))), fullfile(basename, [outfile '-max.png']), 'png');
+  imwrite(mat2gray(meanframe, ptile(meanframe)), fullfile(basename, [outfile '-mean.png']), 'png');
 end % function
