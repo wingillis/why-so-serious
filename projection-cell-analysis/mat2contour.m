@@ -16,7 +16,11 @@ function mat2contour(matname, cnmfename, outfile)
   for i=1:ceil(siz(3)/fivemin)
     % read in 5 minutes of data - should be around 2GB
     fprintf('Running on part %d of %d\n', i, ceil(siz(3)/fivemin));
-    y = single(mf.Y(:, :, (i-1)*fivemin+1:i*fivemin));
+    eind = i*fivemin;
+    if eind > siz(3)
+      eind = siz(3);
+    end
+    y = single(mf.Y(:, :, (i-1)*fivemin+1:eind));
     if mmin == 0
       mmin = prctile(y(:), 10);
       mmax = max(y(:));
