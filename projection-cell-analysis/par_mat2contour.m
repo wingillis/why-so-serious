@@ -1,4 +1,4 @@
-function [full_outfile]=par_mat2contour(matname, ind, contours, outfile)
+function [full_outfile]=par_mat2contour(matname, ind, contours, minmax, outfile)
   mf = matfile(matname);
   [basename, ~, ~] = fileparts(matname);
   siz = mf.sizY;
@@ -6,17 +6,13 @@ function [full_outfile]=par_mat2contour(matname, ind, contours, outfile)
   full_outfile = fullfile(basename, [outfile '.avi']);
   vid = VideoWriter(full_outfile);
   fprintf('Running on part %d of %d\n', i, ceil(siz(3)/fivemin));
-  mmin = 0;
-  mmax = 0;
+  mmin = minmax(1);
+  mmax = minmax(2);
 
   if ind(2) > siz(3)
     ind(2) = siz(3);
   end
   y = single(mf.Y(:, :, ind(1):ind(2)));
-  if mmin == 0
-    mmin = prctile(y(:), 10);
-    mmax = max(y(:));
-  end
 
   ycolor = permute(y, [1 2 4 3]);
   ycolor = ycolor(:, :, [1 1 1], :);

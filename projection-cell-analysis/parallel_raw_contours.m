@@ -14,10 +14,11 @@ function parallel_raw_contours(fname, cnmfename, outfile)
   clear cnmf;
   onemin = 30 * 60; % 30 fps
   chunk = ceil(siz(3)/onemin);
+  minmax = mov_minmax(mf);
   jobs = cell(chunk, 1);
   for i=1:chunk
-    jobs{i} = batch(c, @par_mat2contour, 1,...
-              {fname, [(i-1)*onemin+1 i*onemin], contours, sprintf('%s-%d', outfile, i)});
+    jobs{i} = batch(c, @par_mat2contour, 1, ...
+              {fname, [(i-1)*onemin+1 i*onemin], contours, minmax, sprintf('%s-%d', outfile, i)});
   end
   for i=1:chunk
     wait(jobs{i});
