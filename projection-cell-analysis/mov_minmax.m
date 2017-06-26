@@ -4,7 +4,10 @@ function [mnx]=mov_minmax(mf)
   indices = randi(siz(3)-3000, 3000, 1);
   indices = sort(indices + 3000);
   y1 = mf.Y(:,:, 1:3000);
-  y2 = mf.Y(:,:, indices);
+  y2 = zeros(size(y1), 'uint16');
+  for i=1:3000
+    y2(:,:,i) = mf.Y(:,:, indices(i));
+  end
   y = cat(3, y1, y2);
   clear y1 y2
   mx = max(y, [], 3);
