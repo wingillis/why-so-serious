@@ -1,4 +1,4 @@
-function parallel_raw_contours(fname, cnmfename, outfile)
+function [jobs]=parallel_raw_contours(fname, cnmfename, outfile)
   % read in the size of the movie and send indices to each
   % batch script to make 1 min movies
   ClusterInfo.setQueueName('short');
@@ -20,9 +20,9 @@ function parallel_raw_contours(fname, cnmfename, outfile)
     jobs{i} = batch(c, @par_mat2contour, 1, ...
               {fname, [(i-1)*onemin+1 i*onemin], contours, minmax, sprintf('%s-%d', outfile, i)});
   end
-  for i=1:chunk
-    wait(jobs{i});
-    delete(jobs{i});
-  end
+  % for i=1:chunk
+    % wait(jobs{i});
+    % delete(jobs{i});
+  % end
 
 end
