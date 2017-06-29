@@ -6,7 +6,7 @@ function mat2cnmfe_raw_trace(mfile, cnmfefile)
 	siz = mf.sizY;
 	outdata = struct();
 	outdata.cells = zeros(siz(3), length(contours));
-	masks = zeros(d1*d2, length(contours));
+	masks = zeros(d1*d2, length(contours), 'logical');
 
 	[x, y] = meshgrid(1:d1, 1:d2);
 	for i=1:length(contours)
