@@ -17,7 +17,7 @@ function mat2cnmfe_raw_trace(mfile, cnmfefile)
 
 	% go through each frame once and then compute the fluorescence for each contour
 	for i=1:mf.sizY(3)
-		y = mf.Y(:,:i);
+		y = mf.Y(:, :, i);
 		y = reshape(y, [], 1);
 		for j=1:length(contours)
 			outdata.cells(i, j) = mean(y(masks(:, j)));
