@@ -10,7 +10,7 @@ function parallel_raw_contours(fname, cnmfename, outfile)
   mf = matfile(fname);
   siz = mf.sizY;
   cnmf = load(cnmfename);
-  contours = cnmf.neuron.get_contours();
+  contours = cnmf.neuron.get_contours(0.8);
   clear cnmf;
   onemin = 30 * 60; % 30 fps
   chunk = ceil(siz(3)/onemin);

@@ -5,7 +5,7 @@ function mat2contour(matname, cnmfename, outfile)
   fivemin = 30 * 60 * 5;
 
   cnmfe = load(cnmfename);
-  contours = cnmfe.neuron.get_contours();
+  contours = cnmfe.neuron.get_contours(0.8);
 
   mmin = 0;
   mmax = 0;

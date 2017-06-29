@@ -3,7 +3,7 @@ function cnmfe2contouravi(pth, outname)
   load(pth);
   vid = VideoWriter(fullfile(basename, [outname '.avi']));
   open(vid);
-  contours = neuron.get_contours();
+  contours = neuron.get_contours(0.8);
   neuron_mask = neuron.A;
   calciums = neuron.C_raw;
   % these will be the frames

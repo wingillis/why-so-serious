@@ -2,7 +2,7 @@ function mov2contour(movfile, cnmfefile, outfile)
   r = VideoReader(movfile);
   [basename, ~, ~] = fileparts(movfile);
   f = load(cnmfefile);
-  contours = f.neuron.get_contours();
+  contours = f.neuron.get_contours(0.8);
   clear f
   w = VideoWriter(fullfile(basename, [outfile '.avi']));
   open(w);

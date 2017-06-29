@@ -1,7 +1,7 @@
 function mat2cnmfe_raw_trace(mfile, cnmfefile)
 	% calculates the raw fluorescence values from a given cnmfe contour mask
 	load(cnmfefile);
-	contours = neuron.get_contours();
+	contours = neuron.get_contours(0.8);
 	mf = matfile(mfile);
 	siz = mf.sizY;
 	outdata = struct();
