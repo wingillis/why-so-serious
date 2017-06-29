@@ -3,8 +3,9 @@ function mat2cnmfe_raw_trace(mfile, cnmfefile)
 	load(cnmfefile);
 	contours = neuron.get_contours();
 	mf = matfile(mfile);
+	siz = mf.sizY;
 	outdata = struct();
-	outdata.cells = zeros(mf.sizY(3), length(contours));
+	outdata.cells = zeros(siz(3), length(contours));
 	masks = zeros(d1*d2, length(contours));
 
 	[x, y] = meshgrid(1:d1, 1:d2);
@@ -16,7 +17,7 @@ function mat2cnmfe_raw_trace(mfile, cnmfefile)
 	end
 
 	% go through each frame once and then compute the fluorescence for each contour
-	for i=1:mf.sizY(3)
+	for i=1:siz(3)
 		y = mf.Y(:, :, i);
 		y = reshape(y, [], 1);
 		for j=1:length(contours)
