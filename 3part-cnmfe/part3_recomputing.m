@@ -1,5 +1,9 @@
-function part3_recomputing(fname)
+function part3_recomputing(fname, opt)
   load(fname);
+
+  if nargin < 2
+    opt = options;
+  end
   %% merge neurons
   display_merge = false; % set to true if you want to inspect every candidate merge
   view_neurons = false; % set to true if you want to inspect all neurons after quick merge routine
@@ -8,7 +12,7 @@ function part3_recomputing(fname)
   % detected in different patches
   % thresholds for merging neurons corresponding to:
   % {sptial overlaps, temporal correlation of C, temporal correlation of S}
-  merge_thr = [0.5, 0.5, 0.1];  % choose thresholds for merging neurons (this will primarily merge neurons redundantly found by multiple patch processes, likely in the patch-overlaps)
+  merge_thr = [opt.cnmfe.spatial_corr, opt.cnmfe.temporal_corr, opt.cnmfe.spiketime_corr];  % choose thresholds for merging neurons (this will primarily merge neurons redundantly found by multiple patch processes, likely in the patch-overlaps)
   cnmfe_quick_merge;            % run neuron merges
 
   %% display neurons
