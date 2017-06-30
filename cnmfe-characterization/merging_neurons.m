@@ -1,4 +1,4 @@
-function [neuron_count]=merging_neurons(neuron)
+function [neuron_count]=merging_neurons(neuron, spike_thresh)
   display_merge = false;
   view_neurons = false;
   npoints = 25;
@@ -9,9 +9,8 @@ function [neuron_count]=merging_neurons(neuron)
   % which correlation thresholds to change
   spatial = linspace(0.3, 0, npoints);
   temporal = linspace(0.3, 0, npoints);
-  spiking = linspace(0.1, 0, npoints);
 
-  merge_thr = [1, 1, 0.04];
+  merge_thr = [1, 1, spike_thresh];
 
   for i=1:npoints
     merge_thr(1) = spatial(i);
