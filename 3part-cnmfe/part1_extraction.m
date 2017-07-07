@@ -18,14 +18,16 @@ options = construct_default_params(options);
 data = matfile(nam);
 % the size variable name could vary - this naming scheme is from
 % the memmap_file.m script in cnmfe
-if isempty(whos(data, 'sizY'))
-  Ysiz = data.Ysiz;
-else
-  Ysiz = data.sizY;
-end
-d1 = Ysiz(1);   %height
-d2 = Ysiz(2);   %width
-numFrame = Ysiz(3);    %total number of frames
+% if isempty(whos(data, 'sizY'))
+%   Ysiz = data.Ysiz;
+% else
+%   Ysiz = data.sizY;
+% end
+% d1 = Ysiz(1);   %height
+% d2 = Ysiz(2);   %width
+% numFrame = Ysiz(3);    %total number of frames
+
+[d1,d2,numFrame]=size(data,'Y');
 
 %% create indices for splitting field-of-view into spatially overlapping patches (for parallel processing)
 patches = construct_patches([d1 d2], options.cnmfe.patch_sz, ...
@@ -96,7 +98,7 @@ for i = 1:length(patches)
   % Load data from individual (i-th) patch and store in temporary Sources2D() object ('neuron_patch')
 
   neuron_patch = neuron_full.copy();
-
+ 
   % get movie data relevant to this chunk
   if and(options.cnmfe.ds_space==1, options.cnmfe.ds_time==1)
     % temporal info is the same, but spatial info is now in chunks

@@ -2,6 +2,9 @@ function [options] = construct_default_params(options)
 
   if nargin < 1
     options = struct();
+  end
+  
+  if ~isfield(options,'cnmfe') | ~isstruct(options.cnfme)
     options.cnmfe = struct();
   end
 
