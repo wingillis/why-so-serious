@@ -3,7 +3,11 @@ function [Cn, pnr]=calc_corr_image(nam, options)
   % limit RAM footprint
   % get the filename
   sframe = 1;
-  num2read = 1000;
+  if isfield(options, 'corr_frames')
+    num2read = options.corr_frames;
+  else
+    num2read = 1000;
+  end
   Fs = 30;
 
   data = matfile(nam);
@@ -64,6 +68,6 @@ function [Cn, pnr]=calc_corr_image(nam, options)
     mkdir(dir_neurons);
   end
   if options.cnmfe.save_corr_img
-    saveas(gcf, fullfile(p, dir_neurons, 'correlation.png'), 'png');
+    saveas(gcf, fullfile(p, 'correlation.png'), 'png');
   end
 end % function
