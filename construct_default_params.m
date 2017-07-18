@@ -4,7 +4,7 @@ function [options] = construct_default_params(options)
     options = struct();
   end
   
-  if ~isfield(options,'cnmfe') | ~isstruct(options.cnfme)
+  if ~isfield(options,'cnmfe') | ~isstruct(options.cnmfe)
     options.cnmfe = struct();
   end
 
