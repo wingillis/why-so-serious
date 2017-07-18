@@ -58,7 +58,7 @@ function [Cn, pnr]=calc_corr_image(nam, options)
   axis equal off tight;
   title('Cn*PNR');
 
-  [p, f, ext] = fileparts(nam);
+  [p, f, ~] = fileparts(nam);
   dir_neurons = [f '_neurons'];
   if ~exist(dir_neurons, 'dir')
     mkdir(dir_neurons);
