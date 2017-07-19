@@ -16,7 +16,7 @@ function [neuron_count]=par_gridsearch_fun(merge_thr, savedir, fname)
   disp('Merge done');
 
   neuron.Coor = neuron.get_contours(0.8); % energy within the contour is 80% of the total
-  [Cn, pnr] = calc_corr_image([rawfile '.mat'], opt);
+  [Cn, pnr] = calc_corr_image([rawfile '.mat'], options);
   figure();
   Cn = imresize(Cn, [d1, d2]);
   plot_contours(neuron.A, Cn, 0.8, 0, [], neuron.Coor, 2);
