@@ -8,7 +8,7 @@ function merging_gridsearch(fname, opt)
   assert(contains(fname, '_processed'), 'Must supply processed data');
 
   % load the unmerged data
-  load(fname);
+  load(fname, 'options');
 
   if nargin < 2
     opt = options;
@@ -61,7 +61,7 @@ function merging_gridsearch(fname, opt)
     createTask(job, @par_gridsearch_fun, 1, {merge_thr, param_savedir, fname});
 
   end
-
+  submit(job);
   wait(job);
 
   neuron_count = fetchOutputs(job);
