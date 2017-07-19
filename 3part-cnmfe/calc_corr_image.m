@@ -3,8 +3,8 @@ function [Cn, pnr]=calc_corr_image(nam, options)
   % limit RAM footprint
   % get the filename
   sframe = 1;
-  if isfield(options, 'corr_frames')
-    num2read = options.corr_frames;
+  if isfield(options.cnmfe, 'corr_frames')
+    num2read = options.cnmfe.corr_frames;
   else
     num2read = 1000;
   end
