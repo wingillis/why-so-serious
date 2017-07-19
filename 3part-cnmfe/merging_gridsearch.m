@@ -88,6 +88,9 @@ function merging_gridsearch(fname, opt)
   xticklabel(linspace(maxthresh, 0, 10));
   yticks(linspace(1, npoints, 10));
   yticklabel(linspace(maxthresh, 0, 10));
+  xlabel('spatial thresh');
+  ylabel('termoral thresh');
+  zlabel('neuron count');
 
   view(0, 90);
   print('grid1', '-dpng', '-r300');
