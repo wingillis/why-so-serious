@@ -62,6 +62,8 @@ function merging_gridsearch(fname, opt)
 
   end
   submit(job);
+
+  disp('Waiting for job to finish');
   wait(job);
 
   neuron_count = fetchOutputs(job);
