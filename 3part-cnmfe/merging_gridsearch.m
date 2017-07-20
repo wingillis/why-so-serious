@@ -85,9 +85,9 @@ function merging_gridsearch(fname, opt)
   colormap bone;
 
   xticks(linspace(1, npoints, 10));
-  xticklabel(linspace(maxthresh, 0, 10));
+  xticklabels(linspace(maxthresh, 0, 10));
   yticks(linspace(1, npoints, 10));
-  yticklabel(linspace(maxthresh, 0, 10));
+  yticklabels(linspace(maxthresh, 0, 10));
   xlabel('spatial thresh');
   ylabel('termoral thresh');
   zlabel('neuron count');
