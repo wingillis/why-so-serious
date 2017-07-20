@@ -29,11 +29,13 @@ function merging_gridsearch(fname, opt)
   additional_files = cat(2, cnmfe_files(1:end-1), grin_files(1:end-1));
   c = instantiate_cluster(opt);
 
+  % TODO: save gridsearch params in cnmfe config file
+
   % construct the parameters to search: correlation thresholds
-  % 0.8 cutoff is slightly arbitrary, but in the past I havent
+  % 0.3 cutoff is slightly arbitrary, but in the past I havent
   % seen much change with numbers higher than this
   npoints = 20;
-  maxthresh = 0.8;
+  maxthresh = 0.3;
   spatial = linspace(maxthresh, 0, npoints);
   temporal = linspace(maxthresh, 0, npoints);
   spike_thresh = 0.05;
