@@ -72,7 +72,7 @@ function merging_gridsearch(fname, opt)
   wait(job);
 
   neuron_count = fetchOutputs(job);
-  save('neuron_count.mat', 'neuron_count');
+  save('neuron_count.mat', 'neuron_count', 'maxthresh', 'npoints');
 
   delete(job);
 
