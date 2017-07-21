@@ -34,8 +34,8 @@ function merging_gridsearch(fname, opt)
   % construct the parameters to search: correlation thresholds
   % 0.3 cutoff is slightly arbitrary, but in the past I havent
   % seen much change with numbers higher than this
-  npoints = 20;
-  maxthresh = 0.3;
+  npoints = 30;
+  maxthresh = 0.6;
   spatial = linspace(maxthresh, 0, npoints);
   temporal = linspace(maxthresh, 0, npoints);
   spike_thresh = 0.05;
