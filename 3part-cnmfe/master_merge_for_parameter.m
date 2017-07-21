@@ -21,8 +21,10 @@ function master_merge_for_parameter(spatial, temporal, spike)
     mkdir(fullfile(curdir, newfolder, foldername));
     for j=1:length(processed_files)
       procfile = processed_files(j).name;
+      rawfile = strrep(procfile, '_processed', '');
       disp(['on file ' procfile]);
       system(sprintf('ln -s %s %s', fullfile(curdir, foldername, procfile), fullfile(curdir, newfolder, foldername, procfile)));
+      system(sprintf('ln -s %s %s', fullfile(curdir, foldername, [rawfile '.mat']), fullfile(curdir, newfolder, foldername, [rawfile '.mat'])));
       cd(fullfile(curdir, newfolder, foldername));
       nn = load(procfile);
       nn.options.cnmfe.spatial_corr = spatial;
