@@ -8,6 +8,7 @@ function master_merge_for_parameter(spatial, temporal, spike)
   % make a dir for this merge (assume it's in the inscopix dir)
   newfolder = sprintf('t-%0.3f-s-%0.3f-sp-%0.3f', temporal, spatial, spike);
   mkdir(newfolder);
+  disp(['made dir ' newfolder]);
 
   % gather all the folders with kinect in the name
   dirs = dir('*kinect*');
@@ -15,10 +16,12 @@ function master_merge_for_parameter(spatial, temporal, spike)
   % loop thru each dir and link relevant files
   for i=1:length(dirs)
     foldername = dirs(i).name;
+    disp(['running for ' foldername]);
     processed_files = dir(fullfile(foldername, '*_processed.mat'));
     mkdir(fullfile(curdir, newfolder, foldername));
     for j=1:length(processed_files)
       procfile = processed_files(j).name;
+      disp(['on file ' procfile]);
       system(sprintf('ln -s %s %s', fullfile(curdir, foldername, procfile), fullfile(curdir, newfolder, foldername, procfile)));
       cd(fullfile(curdir, newfolder, foldername));
       nn = load(procfile);
