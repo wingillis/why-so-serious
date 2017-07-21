@@ -30,7 +30,12 @@ function master_merge_for_parameter(spatial, temporal, spike)
       nn.options.cnmfe.spatial_corr = spatial;
       nn.options.cnmfe.temporal_corr = temporal;
       nn.options.cnmfe.spiketime_corr = spike;
-      part3_recomputing(procfile, nn.options);
+      nn.options.cnmfe.save_corr_img = true;
+      try
+        part3_recomputing(procfile, nn.options);
+      catch me
+        disp(['merging did not work for ' procfile]);
+      end
     end
     % to make sure nothing gets really screwed up, return to curdir
     cd(curdir);
