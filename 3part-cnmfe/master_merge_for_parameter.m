@@ -34,6 +34,8 @@ function master_merge_for_parameter(spatial, temporal, spike)
     end
     % to make sure nothing gets really screwed up, return to curdir
     cd(curdir);
+    % just so many windows open up each time :O
+    close('all');
   end
 
 end % function
