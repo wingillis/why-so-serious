@@ -1,4 +1,4 @@
-function mat2dff_img(matname, outfile)
+function grin_movie_stats(matname, outfile)
   [basename, ~, ~] = fileparts(matname);
 
   mf = matfile(matname);
