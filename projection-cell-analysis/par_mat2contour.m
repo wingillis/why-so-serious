@@ -6,7 +6,7 @@ function [full_outfile]=par_mat2contour(matname, ind, contours, minmax, outfile)
   full_outfile = fullfile(basename, [outfile '.avi']);
   vid = VideoWriter(full_outfile);
   open(vid);
-  fprintf('Running on part %d of %d\n', i, ceil(siz(3)/fivemin));
+  fprintf('Running on part %d of %d\n', ind, ceil(siz(3)/fivemin));
   mmin = minmax(1);
   mmax = minmax(2);
 
