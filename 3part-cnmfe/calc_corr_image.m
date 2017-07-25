@@ -68,6 +68,7 @@ function [Cn, pnr]=calc_corr_image(nam, options)
     mkdir(dir_neurons);
   end
   if options.cnmfe.save_corr_img
-    saveas(gcf, fullfile(p, 'correlation.png'), 'png');
+    saveas(gcf, fullfile(p, [f '-correlation.png']), 'png');
+    savefig(gcf, fullfile(p, [f '-correlation']));
   end
 end % function
