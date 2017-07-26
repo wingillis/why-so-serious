@@ -20,14 +20,17 @@ function roi_stackplot(movie_fname, cnmfe_fname, savefolder)
   f2 = figure();
   % TODO: decide btw C and C_raw
   data = neuron.C_raw(1:num_plots, :);
-  maxes = max(data, [], 2);
+  % maxes = max(data, [], 2);
+  % try doing total max instead of individual max
+  maxes = max(data(:));
   additions = 1:num_plots;
   hold on;
   for i=additions
-    data(i, :) = data(i, :) ./ maxes(i);
+    data(i, :) = data(i, :) ./ maxes;
     data(i, :) = data(i, :) + i;
     plot(data(i,:), 'color', colors(i,:));
   end
+  plot([0 30*60], [0 0], 'k', 'LineWidth', 2);
   box off;
   axis tight;
   axis off;
@@ -40,12 +43,12 @@ function roi_stackplot(movie_fname, cnmfe_fname, savefolder)
     saveas(f1, fullfile(savefolder, 'roi-stackplot-1'), 'epsc');
     saveas(f1, fullfile(savefolder, 'roi-stackplot-1'));
     print(f1, fullfile(savefolder, 'roi-stackplot-1'), '-dpng', '-r300');
-    print(f1, fullfile(savefolder, 'roi-stackplot-1'), '-dtiff', '-r 600');
-    
+    print(f1, fullfile(savefolder, 'roi-stackplot-1'), '-dtiff', '-r600');
+
     saveas(f2, fullfile(savefolder, 'roi-stackplot-2'), 'epsc');
     saveas(f2, fullfile(savefolder, 'roi-stackplot-2'));
     print(f2, fullfile(savefolder, 'roi-stackplot-2'), '-dpng', '-r300');
-    print(f2, fullfile(savefolder, 'roi-stackplot-2'), '-dtiff', '-r 600');
+    print(f2, fullfile(savefolder, 'roi-stackplot-2'), '-dtiff', '-r600');
   end
 
 end % function
