@@ -29,10 +29,14 @@ function [img, masks, colors] = fov_rainbow_roi(movie_fname, cnmfe_fname, savepa
     end
   end
 
-  if nargin == 3
-    saveas(f, fullfile(savepath, 'fov-rainbow-roi'), 'epsc');
-    savefig(f, fullfile(savepath, 'fov-rainbow-roi'));
-    print(f, fullfile(savepath, 'fov-rainbow-roi'), '-dpng', '-r300');
+  if nargin == 4
+    fname = 'fov-rainbow-roi';
+    if iscontour
+      fname = [fname '-contour'];
+    end
+    saveas(f, fullfile(savepath, fname), 'epsc');
+    savefig(f, fullfile(savepath, fname));
+    print(f, fullfile(savepath, fname), '-dpng', '-r300');
 
   end
 
