@@ -1,4 +1,4 @@
-function [img, masks, colors] = fov_rainbow_roi(movie_fname, cnmfe_fname)
+function [img, masks, colors] = fov_rainbow_roi(movie_fname, cnmfe_fname, savepath)
   % input downsampled image and cnmfe-extracted roi file
   movief = matfile(movie_fname);
   cnmfef = load(cnmfe_fname);
@@ -8,7 +8,7 @@ function [img, masks, colors] = fov_rainbow_roi(movie_fname, cnmfe_fname)
 
   img = dff(movief, 2000);
 
-  figure();
+  f = figure();
   imshow(repmat(img, 1, 1, 3));
   hold on;
 
@@ -16,5 +16,10 @@ function [img, masks, colors] = fov_rainbow_roi(movie_fname, cnmfe_fname)
     h = imshow(permute(repmat(colors(i, :), x, 1, y), [1 3 2]));
     set(h, 'AlphaData', reshape(masks(:,i), x, y));
   end
-  
+
+  if nargin == 3
+    saveas(f, fullfile(savepath, 'fov-rainbow-roi'), 'epsc');
+    print(f, fullfile(savepath, 'fov-rainbow-roi'), '-dpng', '-r300');
+  end
+
 end % function
