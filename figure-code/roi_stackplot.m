@@ -8,8 +8,7 @@ function roi_stackplot(movie_fname, cnmfe_fname, savefolder)
   img = mean(double(mf.Y(:,:,1:9000)), 3);
   ptile = @(x) [prctile(x(:), 0.5) prctile(x(:), 99.5)];
   img = mat2gray(img, ptile(img));
-  f = figure();
-  subplot(2, 1, 1);
+  f1 = figure();
   imshow(repmat(img, 1, 1, 3));
   hold on;
   for i=1:num_plots
@@ -18,7 +17,7 @@ function roi_stackplot(movie_fname, cnmfe_fname, savefolder)
   end
   hold off;
 
-  subplot(2,1,2);
+  f2 = figure();
   % TODO: decide btw C and C_raw
   data = neuron.C_raw(1:num_plots, :);
   maxes = max(data, [], 2);
@@ -34,12 +33,19 @@ function roi_stackplot(movie_fname, cnmfe_fname, savefolder)
   axis off;
 
   if nargin == 3
-    f.PaperUnits = 'inches';
-    f.PaperPosition = [0 0 8.5 11];
-    saveas(f, fullfile(savefolder, 'roi-stackplot'), 'epsc');
-    saveas(f, fullfile(savefolder, 'roi-stackplot'));
-    print(f, fullfile(savefolder, 'roi-stackplot'), '-dpng', '-r300');
-    print(f, fullfile(savefolder, 'roi-stackplot'), '-dtiff', '-r300');
+    f1.PaperUnits = 'inches';
+    f1.PaperPosition = [0 0 8.5 5.5];
+    f2.PaperUnits = 'inches';
+    f2.PaperPosition = [0 0 8.5 5.5];
+    saveas(f1, fullfile(savefolder, 'roi-stackplot-1'), 'epsc');
+    saveas(f1, fullfile(savefolder, 'roi-stackplot-1'));
+    print(f1, fullfile(savefolder, 'roi-stackplot-1'), '-dpng', '-r300');
+    print(f1, fullfile(savefolder, 'roi-stackplot-1'), '-dtiff', '-r 600');
+    
+    saveas(f2, fullfile(savefolder, 'roi-stackplot-2'), 'epsc');
+    saveas(f2, fullfile(savefolder, 'roi-stackplot-2'));
+    print(f2, fullfile(savefolder, 'roi-stackplot-2'), '-dpng', '-r300');
+    print(f2, fullfile(savefolder, 'roi-stackplot-2'), '-dtiff', '-r 600');
   end
 
 end % function
