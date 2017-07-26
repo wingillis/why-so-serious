@@ -27,8 +27,11 @@ function roi_stackplot(cnmfe_file, movie_file, savefolder)
   end
   box off;
   axis tight;
+  axis off;
 
-  saveas(f, fullfile(savefolder, 'roi_stackplot'), 'epsc');
-  print(f, fullfile(savefolder, 'roi_stackplot'), '-dpng', '-r300');
+  if nargin == 3
+    saveas(f, fullfile(savefolder, 'roi_stackplot'), 'epsc');
+    print(f, fullfile(savefolder, 'roi_stackplot'), '-dpng', '-r300');
+  end
 
 end % function
