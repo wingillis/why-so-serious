@@ -33,7 +33,7 @@ function roi_stackplot(movie_fname, cnmfe_fname, savefolder)
 
   if nargin == 3
     f.PaperUnits = 'inches';
-    f.PaperPosition = [0 0 11 8.5];
+    f.PaperPosition = [0 0 8.5 11];
     saveas(f, fullfile(savefolder, 'roi-stackplot'), 'epsc');
     saveas(f, fullfile(savefolder, 'roi-stackplot'));
     print(f, fullfile(savefolder, 'roi-stackplot'), '-dpng', '-r300');
