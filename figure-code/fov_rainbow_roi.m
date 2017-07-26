@@ -29,7 +29,7 @@ function [img, masks, colors] = fov_rainbow_roi(movie_fname, cnmfe_fname, savepa
     end
   end
 
-  if nargin == 4
+  if nargin >= 3
     fname = 'fov-rainbow-roi';
     if iscontour
       fname = [fname '-contour'];
