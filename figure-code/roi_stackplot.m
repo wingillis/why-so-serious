@@ -39,6 +39,7 @@ function roi_stackplot(movie_fname, cnmfe_fname, savefolder)
     saveas(f, fullfile(savefolder, 'roi-stackplot'), 'epsc');
     saveas(f, fullfile(savefolder, 'roi-stackplot'));
     print(f, fullfile(savefolder, 'roi-stackplot'), '-dpng', '-r300');
+    print(f, fullfile(savefolder, 'roi-stackplot'), '-dtiff', '-r300');
   end
 
 end % function
