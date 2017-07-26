@@ -5,7 +5,9 @@ function roi_stackplot(movie_fname, cnmfe_fname, savefolder)
   mf = matfile(movie_fname);
   % TODO: do mean instead of dff
   % img = dff(mf, 9000);
-  img = mean(mf.Y(:,:,1:9000), 3);
+  img = mean(double(mf.Y(:,:,1:9000)), 3);
+  ptile = @(x) [prctile(x(:), 0.5) prctile(x(:), 99.5)];
+  img = mat2gray(img, ptile(img));
   f = figure();
   subplot(2, 1, 1);
   imshow(repmat(img, 1, 1, 3));

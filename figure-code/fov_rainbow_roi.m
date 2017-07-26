@@ -11,6 +11,8 @@ function [img, masks, colors] = fov_rainbow_roi(movie_fname, cnmfe_fname, savepa
   % don't do dff it's too grainy
   % img = dff(movief, 2000);
   img = mean(movief.Y(:,:,1:9000), 3);
+  ptile = @(x) [prctile(x(:), 0.5) prctile(x(:), 99.5)];
+  img = mat2gray(img, ptile(img));
 
   f = figure();
   imshow(repmat(img, 1, 1, 3));
