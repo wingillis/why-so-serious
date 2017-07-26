@@ -3,6 +3,8 @@ function [img, masks, colors] = fov_rainbow_roi(movie_fname, cnmfe_fname, savepa
   movief = matfile(movie_fname);
   cnmfef = load(cnmfe_fname);
 
+  [x, y, z] = size(movief, 'Y');
+
   masks = cnmfef.neuron.A;
   colors = jet(size(masks, 2));
 
@@ -20,6 +22,7 @@ function [img, masks, colors] = fov_rainbow_roi(movie_fname, cnmfe_fname, savepa
   if nargin == 3
     saveas(f, fullfile(savepath, 'fov-rainbow-roi'), 'epsc');
     print(f, fullfile(savepath, 'fov-rainbow-roi'), '-dpng', '-r300');
+
   end
 
 end % function
