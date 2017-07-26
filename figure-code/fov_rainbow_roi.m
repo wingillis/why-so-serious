@@ -1,4 +1,4 @@
-function [dff, masks, colors] = fov_rainbow_roi(movie_fname, cnmfe_fname)
+function [img, masks, colors] = fov_rainbow_roi(movie_fname, cnmfe_fname)
   % input downsampled image and cnmfe-extracted roi file
   movief = matfile(movie_fname);
   cnmfef = load(cnmfe_fname);
