@@ -6,7 +6,7 @@ function roi_stackplot(cnmfe_file, movie_file)
   img = dff(mf, 1000);
   figure();
   subplot(2, 1, 1);
-  imshow(1-repmat(img, 1, 1, 3));
+  imshow(repmat(img, 1, 1, 3));
   hold on;
   for i=1:num_plots
     h = imshow(permute(repmat(colors(i, :), d1, 1, d2), [1 3 2]));
