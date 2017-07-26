@@ -10,7 +10,7 @@ function [img, masks, colors] = fov_rainbow_roi(movie_fname, cnmfe_fname, savepa
 
   % don't do dff it's too grainy
   % img = dff(movief, 2000);
-  img = mean(movief.Y(:,:,1:3000), 3);
+  img = mean(movief.Y(:,:,1:9000), 3);
 
   f = figure();
   imshow(repmat(img, 1, 1, 3));
