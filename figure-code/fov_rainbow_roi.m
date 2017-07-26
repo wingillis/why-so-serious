@@ -1,4 +1,4 @@
-function [img, masks, colors] = fov_rainbow_roi(movie_fname, cnmfe_fname, savepath)
+function [img, masks, colors] = fov_rainbow_roi(movie_fname, cnmfe_fname, savepath, iscontour)
   % input downsampled image and cnmfe-extracted roi file
   movief = matfile(movie_fname);
   cnmfef = load(cnmfe_fname);
@@ -18,9 +18,15 @@ function [img, masks, colors] = fov_rainbow_roi(movie_fname, cnmfe_fname, savepa
   imshow(repmat(img, 1, 1, 3));
   hold on;
 
-  for i=1:size(masks, 2)
-    h = imshow(permute(repmat(colors(i, :), x, 1, y), [1 3 2]));
-    set(h, 'AlphaData', reshape(masks(:,i), x, y));
+  if ~iscontour
+    for i=1:size(masks, 2)
+      h = imshow(permute(repmat(colors(i, :), x, 1, y), [1 3 2]));
+      set(h, 'AlphaData', reshape(masks(:,i), x, y));
+    end
+  else
+    for i=1:length(cnmfef.neuron.Coor)
+      plot(cnmfef.neuron.Coor{i}(1,:), cnmfef.neuron.Coor{i}(2,:), 'color', colors(i,:), 'LineWidth', 1);
+    end
   end
 
   if nargin == 3
