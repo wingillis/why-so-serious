@@ -1,6 +1,6 @@
 function roi_stackplot(movie_fname, cnmfe_fname, savefolder)
   num_plots = 10;
-  colors = cubehelix(num_plots, 0.0, -0.34, 0.96, 0.83, [0.13 0.90], [0.19 0.85]);
+  colors = cubehelix(num_plots, 0.0, -0.93, 0.96, 0.83, [0.13 0.82], [0.19 0.85]);
   load(cnmfe_fname);
   mf = matfile(movie_fname);
   % TODO: do mean instead of dff
