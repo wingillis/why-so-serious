@@ -1,12 +1,14 @@
-function fov_rainbow_roi(movie_fname, cnmfe_fname)
+function [dff, masks, colors] = fov_rainbow_roi(movie_fname, cnmfe_fname)
   % input downsampled image and cnmfe-extracted roi file
   movief = matfile(movie_fname);
   cnmfef = load(cnmfe_fname);
 
   fps = 30;
   fivemin = fps * 60 * 5;
+  numframes = 2000;
 
   [x, y, z] = size(movief, 'Y');
+  z = numframes;
   masks = cnmfef.neuron.A;
 
   meanframe = zeros(x, y, 'double');
