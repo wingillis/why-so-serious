@@ -3,7 +3,7 @@ function roi_stackplot(movie_fname, cnmfe_fname, savefolder)
   colors = cubehelix(num_plots, 0.0, -0.34, 0.96, 0.83, [0.13 0.90], [0.19 0.85]);
   load(cnmfe_fname);
   mf = matfile(movie_fname);
-  img = dff(mf, 1000);
+  img = dff(mf, 3000);
   f = figure();
   subplot(2, 1, 1);
   imshow(repmat(img, 1, 1, 3));
@@ -30,8 +30,11 @@ function roi_stackplot(movie_fname, cnmfe_fname, savefolder)
   axis off;
 
   if nargin == 3
-    saveas(f, fullfile(savefolder, 'roi_stackplot'), 'epsc');
-    print(f, fullfile(savefolder, 'roi_stackplot'), '-dpng', '-r300');
+    f.PaperUnits = 'inches';
+    f.PaperPosition = [0 0 11 8.5];
+    saveas(f, fullfile(savefolder, 'roi-stackplot'), 'epsc');
+    saveas(f, fullfile(savefolder, 'roi-stackplot'));
+    print(f, fullfile(savefolder, 'roi-stackplot'), '-dpng', '-r300');
   end
 
 end % function
