@@ -37,6 +37,7 @@ function [img, masks, colors] = fov_rainbow_roi(movie_fname, cnmfe_fname, savepa
     saveas(f, fullfile(savepath, fname), 'epsc');
     savefig(f, fullfile(savepath, fname));
     print(f, fullfile(savepath, fname), '-dpng', '-r300');
+    print(f, fullfile(savepath, fname), '-dtiff', '-r300');
 
   end
 
