@@ -3,7 +3,9 @@ function roi_stackplot(movie_fname, cnmfe_fname, savefolder)
   colors = cubehelix(num_plots, 0.0, -0.34, 0.96, 0.83, [0.13 0.90], [0.19 0.85]);
   load(cnmfe_fname);
   mf = matfile(movie_fname);
-  img = dff(mf, 9000);
+  % TODO: do mean instead of dff
+  % img = dff(mf, 9000);
+  img = mean(mf.Y(:,:,1:9000), 3);
   f = figure();
   subplot(2, 1, 1);
   imshow(repmat(img, 1, 1, 3));
