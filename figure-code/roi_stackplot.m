@@ -28,7 +28,7 @@ function roi_stackplot(movie_fname, cnmfe_fname, savefolder)
   for i=additions
     data(i, :) = data(i, :) ./ maxes;
     data(i, :) = data(i, :) + i;
-    plot(data(i,:), 'color', colors(i,:));
+    plot(data(i,:), 'color', colors(i,:), 'LineWidth', 1.5);
   end
   plot([0 30*60], [0 0], 'k', 'LineWidth', 2);
   box off;
