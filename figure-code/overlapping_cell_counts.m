@@ -19,7 +19,7 @@ function overlapping_cell_counts()
   ylabel('proportion');
   f.PaperUnits = 'inches';
   f.PaperPosition = [0 0 4 3];
-  saveas(f, '/Users/wgillis/Dropbox (HMS)/lab-datta/projects/dls-function/paper/figs/overlapping-cell-count/cre-on-off-overlap', 'epsc');
-  savefig(f, '/Users/wgillis/Dropbox (HMS)/lab-datta/projects/dls-function/paper/figs/overlapping-cell-count/cre-on-off-overlap');
-  print(f, '/Users/wgillis/Dropbox (HMS)/lab-datta/projects/dls-function/paper/figs/overlapping-cell-count/cre-on-off-overlap', '-r300', '-dtiff');
+  saveas(f, '/Users/wgillis/Dropbox (HMS)/lab-datta/projects/dls-function/paper/figs/overlapping-cell-count/cre-on-off overlap', 'epsc');
+  savefig(f, '/Users/wgillis/Dropbox (HMS)/lab-datta/projects/dls-function/paper/figs/overlapping-cell-count/cre-on-off overlap');
+  print(f, '/Users/wgillis/Dropbox (HMS)/lab-datta/projects/dls-function/paper/figs/overlapping-cell-count/cre-on-off overlap', '-r300', '-dtiff');
 end % function
