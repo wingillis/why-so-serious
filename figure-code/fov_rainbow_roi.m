@@ -14,6 +14,10 @@ function [img, masks, colors] = fov_rainbow_roi(movie_fname, cnmfe_fname, savepa
   ptile = @(x) [prctile(x(:), 0.5) prctile(x(:), 99.5)];
   img = mat2gray(img, ptile(img));
 
+  if ~isfield(cnmfef.neuron, 'Coor')
+    cnmfef.neuron.Coor = cnmfef.neuron.get_contours(0.8);
+  end
+
   f = figure();
   imshow(repmat(img, 1, 1, 3));
   hold on;
