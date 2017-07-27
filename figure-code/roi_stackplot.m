@@ -19,7 +19,7 @@ function roi_stackplot(movie_fname, cnmfe_fname, savefolder)
 
   f2 = figure();
   % TODO: decide btw C and C_raw
-  data = neuron.C_raw(1:num_plots, 1:(30*60));
+  data = neuron.C_raw(num_plots:2*num_plots, :);
   % maxes = max(data, [], 2);
   % try doing total max instead of individual max
   maxes = max(data(:));
@@ -41,12 +41,12 @@ function roi_stackplot(movie_fname, cnmfe_fname, savefolder)
     f2.PaperUnits = 'inches';
     f2.PaperPosition = [0 0 8.5 5.5];
     saveas(f1, fullfile(savefolder, 'roi-stackplot-1'), 'epsc');
-    saveas(f1, fullfile(savefolder, 'roi-stackplot-1'));
+    savefig(f1, fullfile(savefolder, 'roi-stackplot-1'));
     print(f1, fullfile(savefolder, 'roi-stackplot-1'), '-dpng', '-r300');
     print(f1, fullfile(savefolder, 'roi-stackplot-1'), '-dtiff', '-r600');
 
     saveas(f2, fullfile(savefolder, 'roi-stackplot-2'), 'epsc');
-    saveas(f2, fullfile(savefolder, 'roi-stackplot-2'));
+    savefig(f2, fullfile(savefolder, 'roi-stackplot-2'));
     print(f2, fullfile(savefolder, 'roi-stackplot-2'), '-dpng', '-r300');
     print(f2, fullfile(savefolder, 'roi-stackplot-2'), '-dtiff', '-r600');
   end
