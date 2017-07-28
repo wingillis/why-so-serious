@@ -3,7 +3,6 @@ function roi_stackplot(movie_fname, cnmfe_fname, savefolder)
   colors = cubehelix(num_plots, 0.0, -0.93, 0.96, 0.83, [0.13 0.82], [0.19 0.85]);
   load(cnmfe_fname);
   mf = matfile(movie_fname);
-  % TODO: do mean instead of dff
   % img = dff(mf, 9000);
   img = mean(double(mf.Y(:,:,1:9000)), 3);
   ptile = @(x) [prctile(x(:), 0.5) prctile(x(:), 99.5)];
@@ -18,7 +17,6 @@ function roi_stackplot(movie_fname, cnmfe_fname, savefolder)
   hold off;
 
   f2 = figure();
-  % TODO: decide btw C and C_raw
   data = neuron.C_raw(num_plots:2*num_plots, :);
   % maxes = max(data, [], 2);
   % try doing total max instead of individual max
@@ -27,6 +25,8 @@ function roi_stackplot(movie_fname, cnmfe_fname, savefolder)
   hold on;
   for i=additions
     data(i, :) = data(i, :) ./ maxes;
+    % adding half-wave rectification here
+    data(i, :) = data(i, :) .* (data(i, :) > 0);
     data(i, :) = data(i, :) + i;
     plot(data(i,:), 'color', colors(i,:), 'LineWidth', 1.5);
   end
