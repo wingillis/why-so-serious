@@ -3,6 +3,8 @@ function part2_validation(fname)
 
   load(fname);
 
+  fprintf('Will process %d neurons\n\n', size(neuron.C, 2));
+
   %% delete, trim, split neurons
   % neuron.viewNeurons([], neuron.C_raw);
   neuron.displayNeurons([], neuron.C_raw);
