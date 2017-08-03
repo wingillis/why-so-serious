@@ -1,0 +1,13 @@
+#!/bin/bash
+#SBATCH -n 1
+#SBATCH -t 0-24:00
+#SBATCH -p medium
+#SBATCH --mem=4G
+#SBATCH --mail-type=END
+#SBATCH --mail-user=wgillis@g.harvard.edu
+
+module load matlab/2016b
+echo "$(pwd)"
+echo "Running for $1"
+matlab -r "addpath(genpath('/home/wg41/code/grin-analysis/')); downsample_recording('$1', 4);"
+
