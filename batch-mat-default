@@ -1,0 +1,18 @@
+#!/bin/bash
+#SBATCH -n 1
+#SBATCH --mem=40G
+#SBATCH -p short
+#SBATCH -t 8:00:00
+#SBATCH --mail-type=END
+#SBATCH --mail-user=wgillis@g.harvard.edu
+
+# set up so that you can run any quick matlab command thru slurm
+
+#module load matlab/2017a
+module load matlab/2016b
+cnmfepat="${HOME}/code/CNMF_E"
+grinpath="${HOME}/code/grin-analysis"
+classpath="${HOME}/code/grin-class"
+echo "$(pwd)"
+echo "Running this command: $1"
+matlab -r "addpath(genpath('${classpath}')); addpath(genpath('${grinpath}')); addpath(genpath('${cnmfepath}')); $1;"
