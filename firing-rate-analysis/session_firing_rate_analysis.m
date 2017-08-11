@@ -31,21 +31,37 @@ histogram(medianTimes, 100);
 figure(2);
 bar(edges(1:end-1), itis);
 
-figure(3);
-plot(spikeOnsets);
+% figure(3);
+% plot(spikeOnsets);
 
-sigma = 1.4;
-sz = 35;    % length of gaussFilter vector
+sigma = 0.5;
+sz = 55;    % length of gaussFilter vector
 x = linspace(-sz / 2, sz / 2, sz);
 gaussFilter = exp(-x .^ 2 / (2 * sigma ^ 2));
 gaussFilter = gaussFilter / sum (gaussFilter);
 %
 smoothedSpikes = conv(spikeOnsets, gaussFilter, 'same');
 
-figure(4);
-imagesc(allSpikes)
+figure(3);
+plot(smoothedSpikes)
 
 cellSpikes = mat2cell(allSpikes, ones(1, size(allSpikes,1)), size(allSpikes, 2));
 cellSmoothedSpikes = cellfun(@(x) conv(x, gaussFilter, 'same'), cellSpikes, 'uniformoutput', false);
-
 cellSmoothedSpikes = cell2mat(cellSmoothedSpikes);
+
+figure(4);
+imagesc(cellSmoothedSpikes)
+
+% what the hellll happens when we try to compute the spectrum of the signal
+sampling = 901;
+fftsig = fft(smoothedSpikes, sampling); % arbitrary sample size
+powah = fftsig.*conj(fftsig)/floor(sampling/2);
+freq = 30/sampling*(0:floor(sampling/2));
+
+fig = figure(5);
+plot(freq, powah(1:ceil(sampling/2)));
+ylim([0 500]);
+xlim([0 5]);
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [0 0 4 2];
+print(fig, 'frequency-analysis', '-dpng', '-r150');
