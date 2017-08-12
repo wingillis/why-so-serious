@@ -31,10 +31,8 @@ histogram(medianTimes, 100);
 figure(2);
 bar(edges(1:end-1), itis);
 
-% figure(3);
-% plot(spikeOnsets);
-
-sigma = 0.5;
+% NOTE: I changed sigma from 0.5 to this:
+sigma = 1;
 sz = 55;    % length of gaussFilter vector
 x = linspace(-sz / 2, sz / 2, sz);
 gaussFilter = exp(-x .^ 2 / (2 * sigma ^ 2));
@@ -53,17 +51,70 @@ figure(4);
 imagesc(cellSmoothedSpikes)
 
 % what the hellll happens when we try to compute the spectrum of the signal
-sampling = 1025;
-fftsig = fft(smoothedSpikes, sampling); % arbitrary sample size
-powah = fftsig.*conj(fftsig)/floor(sampling/2);
-freq = 30/sampling*(0:floor(sampling/2));
+sampling = 1024;
+fftsig = fft(zscore(smoothedSpikes), sampling); % arbitrary sample size
+powah = fftsig.*conj(fftsig)/(sampling/2);
+freq = 30/sampling*(0:(sampling/2)-1);
 
 fig = figure(5);
-plot(freq, powah(1:ceil(sampling/2)));
+plot(freq, powah(1:sampling/2));
 ylim([0 500]);
 xlim([0 5]);
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 4 2];
 print(fig, 'frequency-analysis', '-dpng', '-r150');
+
+% plotting random projections
+num_dims = 300;
+n = size(cellSmoothedSpikes,1);
+% random rotations
+S = randn(n, num_dims) / sqrt(num_dims);
+C = zscore(cellSmoothedSpikes', [], 1) * S;
+figure(6);
+imagesc(C');
+colormap bone;
+
+thresh = 0.15;
+smooth_sig = 0.43;
+deltac=delta_coefficients(C',2);
+bin_score=abs(deltac)>thresh;
+kernel=normpdf([round(-smooth_sig*6):round(smooth_sig*6)],0,smooth_sig);
+smooth_score=conv(mean(bin_score),kernel,'same');
+
+figure(7);
+plot(smooth_score);
+
+function DELTAC=delta_coefficients(DATA, WIN, PAD)
+  if nargin<3 | isempty(PAD), PAD=1; end
+  if nargin<2 | isempty(WIN), WIN=2; end
+  if nargin<1, error('Need DATA matrix to continue'); end
+
+  if isvector(DATA)
+      DATA=DATA(:)';
+  end
+
+  if PAD==1
+  	DATA=[zeros(size(DATA,1),WIN) DATA  zeros(size(DATA,1),WIN)];
+  elseif PAD==2
+  	DATA=[ones(size(DATA,1),WIN).*repmat([DATA(:,1)],[1 WIN]) DATA ones(size(DATA,1),WIN).*repmat([DATA(:,end)],[1 WIN])];
+  end
+
+  WIN=round(WIN);
+
+  [rows,columns]=size(DATA);
+
+  % lose the edges via the window
+
+  DELTAC=zeros(rows,columns-(2*(WIN+1)));
+
+  for i=WIN+1:columns-(WIN)
+
+  	deltanum=sum(repmat(1:WIN,[rows 1]).*(DATA(:,i+1:i+WIN)-DATA(:,i-WIN:i-1)),2);
+  	deltaden=2*sum([1:WIN].^2);
+
+  	DELTAC(:,i-(WIN))=deltanum./deltaden;
+  end
+
+end
 
 % detrend and run a periodogram to smooth the data - spectrogram
