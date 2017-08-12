@@ -12,7 +12,7 @@ allITIs = [];
 
 for i=1:size(neuron.C_raw, 1)
   tmp = smooth(diff(neuron.C_raw(i,:)), 5);
-  spikes = tmp > 2*std(tmp);
+  spikes = tmp > (2*std(tmp) + mean(tmp));
   spikes = conv([1 -1], double(spikes));
   spikeTimes{i} = diff(find(spikes == 1));
   spikeTimes{i} = 1./spikeTimes{i}.*30;
@@ -53,7 +53,7 @@ figure(4);
 imagesc(cellSmoothedSpikes)
 
 % what the hellll happens when we try to compute the spectrum of the signal
-sampling = 901;
+sampling = 1025;
 fftsig = fft(smoothedSpikes, sampling); % arbitrary sample size
 powah = fftsig.*conj(fftsig)/floor(sampling/2);
 freq = 30/sampling*(0:floor(sampling/2));
@@ -65,3 +65,5 @@ xlim([0 5]);
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 4 2];
 print(fig, 'frequency-analysis', '-dpng', '-r150');
+
+% detrend and run a periodogram to smooth the data - spectrogram
