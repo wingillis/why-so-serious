@@ -60,25 +60,6 @@ end
 
 % phan.get_interbehavior_distance;
 
-% make sure the frames are aligned with the kinect data
-% allSpikes = zeros(size(neuron.C_raw));
-%
-% for i=1:size(neuron.C_raw, 1)
-%   tmp = smooth(diff(neuron.C_raw(i,:)), 5);
-%   spikes = tmp > (2*std(tmp) + mean(tmp));
-%   spikes = conv([1 -1], double(spikes));
-%   allSpikes(i, find(spikes==1)+1) = 1;
-% end
-%
-% sigma = % TODO: use value from gridsearch when it finishes
-% sz = 55;    % length of gaussFilter vector
-% x = linspace(-sz / 2, sz / 2, sz);
-% gaussFilter = exp(-x .^ 2 / (2 * sigma ^ 2));
-% gaussFilter = gaussFilter / sum (gaussFilter);
-%
-% cellSpikes = mat2cell(allSpikes, ones(1, size(allSpikes,1)), size(allSpikes, 2));
-% cellSmoothedSpikes = cellfun(@(x) conv(x, gaussFilter, 'same'), cellSpikes, 'uniformoutput', false);
-% cellSmoothedSpikes = cell2mat(cellSmoothedSpikes);
 deltac = delta_coefficients(phanalysis.nanzscore(caraw')', 2);
 
 thresh = 1;
@@ -90,9 +71,9 @@ cps = map_time(obj.projections.changepoint_score);
 % grab the indices of the changepoints
 smooth_score = smooth_score(600:end-600);
 cps = cps(600:end-600);
-[~, locs] = findpeaks(phanalysis.nanzscore(smooth_score), 'minpeakdistance', 4, 'minpeakheight', 1.75);
+[~, locs] = findpeaks(phanalysis.nanzscore(smooth_score), 'minpeakdistance', 4, 'minpeakheight', 0.75);
 
-[~, behlocs] = findpeaks(phanalysis.nanzscore(cps), 'minpeakdistance', 4, 'minpeakheight', 0.75);
+[~, behlocs] = findpeaks(phanalysis.nanzscore(cps), 'minpeakdistance', 4, 'minpeakheight', 1);
 
 edges = [1:20 100 1000];
 figure(1);
@@ -100,6 +81,7 @@ histogram(diff(locs), edges);
 hold on;
 histogram(diff(behlocs), edges);
 hold off;
+xlim([0 20]);
 
 [cor, lags] = xcorr(phanalysis.nanzscore(smooth_score), phanalysis.nanzscore(cps), 'coeff');
 % smcor = conv(cor, kernel, 'same');
@@ -145,7 +127,7 @@ title('Nearest cellular changepoints');
 print(gcf, '/n/groups/datta/win/dls-data-final/inscopix/nearest-cell-cp', '-dpng')
 
 rng(1);
-numsims = 200;
+numsims = 20;
 randomized_cp_diff = zeros(numsims, length(locs));
 
 for j=1:numsims
@@ -172,7 +154,7 @@ hold off;
 title('Nearest behavioral changepoints vs rndm');
 
 rng(1);
-numsims = 200;
+numsims = 20;
 randomized_cp_diff2 = zeros(numsims, length(locs));
 
 for j=1:numsims
@@ -197,3 +179,4 @@ hold on;
 histogram(randomized_cp_vec2, 'normalization', 'probability');
 hold off;
 title('Nearest cellular changepoints vs rndm');
+
