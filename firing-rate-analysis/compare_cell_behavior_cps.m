@@ -94,10 +94,11 @@ cps = cps(600:end-600);
 
 [~, behlocs] = findpeaks(phanalysis.nanzscore(cps), 'minpeakdistance', 4, 'minpeakheight', 0.75);
 
+edges = [1:10 100 1000];
 figure(1);
-ksdensity(diff(locs));
+histogram(diff(locs), edges);
 hold on;
-ksdensity(diff(behlocs));
+histogram(diff(behlocs), edges);
 hold off;
 
 [cor, lags] = xcorr(phanalysis.nanzscore(smooth_score), phanalysis.nanzscore(cps), 'coeff');
