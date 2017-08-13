@@ -94,10 +94,15 @@ cps = cps(600:end-600);
 
 [~, behlocs] = findpeaks(phanalysis.nanzscore(cps), 'minpeakdistance', 4, 'minpeakheight', 0.75);
 
+figure(1);
+ksdensity(diff(locs));
+hold on;
+ksdensity(diff(behlocs));
+hold off;
 
 [cor, lags] = xcorr(phanalysis.nanzscore(smooth_score), phanalysis.nanzscore(cps), 'coeff');
 % smcor = conv(cor, kernel, 'same');
-figure(1);
+figure(2);
 plot(lags, cor);
 xlim([-180 180]);
 xlabel('Lag - Frames');
@@ -115,7 +120,7 @@ for i=1:length(locs)
 
 end
 
-figure(2);
+figure(3);
 ksdensity(cell_cp_diff);
 title('Nearest behavioral changepoints');
 print(gcf, '/n/groups/datta/win/dls-data-final/inscopix/nearest-behavior-cp', '-dpng')
@@ -133,7 +138,7 @@ for i=1:length(behlocs)
 
 end
 
-figure(3);
+figure(4);
 ksdensity(behavioral_cp_diff);
 title('Nearest cellular changepoints');
 print(gcf, '/n/groups/datta/win/dls-data-final/inscopix/nearest-cell-cp', '-dpng')
@@ -158,7 +163,7 @@ end
 % randomized_cp_diff = median(randomized_cp_diff, 1);
 randomized_cp_vec = reshape(randomized_cp_diff, [], 1);
 
-figure(4);
+figure(5);
 histogram(cell_cp_diff, 'normalization', 'probability');
 hold on;
 histogram(randomized_cp_vec, 'normalization', 'probability');
@@ -185,7 +190,7 @@ end
 % randomized_cp_diff = median(randomized_cp_diff, 1);
 randomized_cp_vec2 = reshape(randomized_cp_diff2, [], 1);
 
-figure(5);
+figure(6);
 histogram(behavioral_cp_diff, 'normalization', 'probability');
 hold on;
 histogram(randomized_cp_vec2, 'normalization', 'probability');
