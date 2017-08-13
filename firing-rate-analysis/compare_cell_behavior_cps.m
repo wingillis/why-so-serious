@@ -116,6 +116,7 @@ end
 figure(2);
 ksdensity(temporal_diff);
 title('Nearest behavioral changepoints');
+print(gcf, '/n/groups/datta/win/dls-data-final/inscopix/nearest-behavior-cp', '-dpng')
 
 % find the nearest imaging changepoint from the behavioral data
 temporal_diff = [];
@@ -133,3 +134,4 @@ end
 figure(3);
 ksdensity(temporal_diff);
 title('Nearest cellular changepoints');
+print(gcf, '/n/groups/datta/win/dls-data-final/inscopix/nearest-cell-cp', '-dpng')
