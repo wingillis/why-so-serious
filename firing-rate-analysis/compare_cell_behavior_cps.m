@@ -136,19 +136,24 @@ ksdensity(behavioral_cp_diff);
 title('Nearest cellular changepoints');
 print(gcf, '/n/groups/datta/win/dls-data-final/inscopix/nearest-cell-cp', '-dpng')
 
-rndcps = phanalysis.phase_randomize(cps);
-[~, rndlocs] = findpeaks(phanalysis.nanzscore(double(rndcps)), 'minpeakdistance', 4);
-randomized_cp_diff = [];
-for i=1:length(locs)
-  tmp_loc = locs(i);
-  bloc_diff = rndlocs - tmp_loc;
-  % where does this datapoint lie in the data?
-  locloc = find(min(abs(bloc_diff))==abs(bloc_diff));
-  locloc = locloc(1); % only care about the first ex
-  randomized_cp_diff(i) = tmp_loc - rndlocs(locloc);
+rng(1);
+numsims = 100;
+randomized_cp_diff = zeros(numsims, length(locs));
+
+for j=1:numsims
+  rndcps = phanalysis.phase_randomize(cps);
+  [~, rndlocs] = findpeaks(phanalysis.nanzscore(double(rndcps)), 'minpeakdistance', 4);
+  for i=1:length(locs)
+    tmp_loc = locs(i);
+    bloc_diff = rndlocs - tmp_loc;
+    % where does this datapoint lie in the data?
+    locloc = find(min(abs(bloc_diff))==abs(bloc_diff));
+    locloc = locloc(1); % only care about the first ex
+    randomized_cp_diff(j, i) = tmp_loc - rndlocs(locloc);
+  end
 end
 
-
+randomized_cp_diff = mean(randomized_cp_diff, 1);
 
 figure(4);
 ksdensity(cell_cp_diff);
