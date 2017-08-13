@@ -90,7 +90,7 @@ cps = map_time(obj.projections.changepoint_score);
 % grab the indices of the changepoints
 smooth_score = smooth_score(600:end-600);
 cps = cps(600:end-600);
-[~, locs] = findpeaks(phanalysis.nanzscore(smooth_score), 'minpeakdistance', 4, 'minpeakheight', 0.75);
+[~, locs] = findpeaks(phanalysis.nanzscore(smooth_score), 'minpeakdistance', 4, 'minpeakheight', 1.75);
 
 [~, behlocs] = findpeaks(phanalysis.nanzscore(cps), 'minpeakdistance', 4, 'minpeakheight', 0.75);
 
