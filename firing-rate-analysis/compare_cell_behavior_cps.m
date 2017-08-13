@@ -87,11 +87,11 @@ bin_score=abs(deltac)>thresh;
 kernel=normpdf([round(-smooth_sig*6):round(smooth_sig*6)],0,smooth_sig);
 smooth_score=conv(nanmean(bin_score),kernel, 'same');
 % grab the indices of the changepoints
-[~, locs] = findpeaks(phanalysis.nanzscore(smooth_score), 'minpeakdistance', 4);
-
-[~, behlocs] = findpeaks(phanalysis.nanzscore(map_time(obj.projections.changepoint_score)), 'minpeakdistance', 4);
+[~, locs] = findpeaks(phanalysis.nanzscore(smooth_score(600:end-600)), 'minpeakdistance', 4);
 
 cps = map_time(obj.projections.changepoint_score);
+[~, behlocs] = findpeaks(phanalysis.nanzscore(cps(600:end-600)), 'minpeakdistance', 4);
+
 
 [cor, lags] = xcorr(phanalysis.nanzscore(smooth_score), phanalysis.nanzscore(cps), 'coeff');
 % smcor = conv(cor, kernel, 'same');
