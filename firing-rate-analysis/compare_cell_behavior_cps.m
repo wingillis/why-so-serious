@@ -101,7 +101,7 @@ xlim([-180 180]);
 xlabel('Lag - Frames');
 ylabel('Corr.')
 
-temporal_diff = [];
+cell_cp_diff = [];
 % find the nearest behavioral changepoint from the imaging data
 for i=1:length(locs)
   tmp_loc = locs(i);
@@ -109,17 +109,17 @@ for i=1:length(locs)
   % where does this datapoint lie in the data?
   locloc = find(min(abs(bloc_diff))==abs(bloc_diff));
   locloc = locloc(1); % only care about the first ex
-  temporal_diff(i) = tmp_loc - behlocs(locloc);
+  cell_cp_diff(i) = tmp_loc - behlocs(locloc);
 
 end
 
 figure(2);
-ksdensity(temporal_diff);
+ksdensity(cell_cp_diff);
 title('Nearest behavioral changepoints');
 print(gcf, '/n/groups/datta/win/dls-data-final/inscopix/nearest-behavior-cp', '-dpng')
 
 % find the nearest imaging changepoint from the behavioral data
-temporal_diff = [];
+behavioral_cp_diff = [];
 % find the nearest behavioral changepoint from the imaging data
 for i=1:length(behlocs)
   tmp_loc = behlocs(i);
@@ -127,11 +127,31 @@ for i=1:length(behlocs)
   % where does this datapoint lie in the data?
   locloc = find(min(abs(bloc_diff))==abs(bloc_diff));
   locloc = locloc(1); % only care about the first ex
-  temporal_diff(i) = tmp_loc - locs(locloc);
+  behavioral_cp_diff(i) = tmp_loc - locs(locloc);
 
 end
 
 figure(3);
-ksdensity(temporal_diff);
+ksdensity(behavioral_cp_diff);
 title('Nearest cellular changepoints');
 print(gcf, '/n/groups/datta/win/dls-data-final/inscopix/nearest-cell-cp', '-dpng')
+
+rndcps = phanalysis.phase_randomize(cps);
+[~, rndlocs] = findpeaks(phanalysis.nanzscore(rndcps), 'minpeakdistance', 4);
+randomized_cp_diff = [];
+for i=1:length(locs)
+  tmp_loc = locs(i);
+  bloc_diff = rndlocs - tmp_loc;
+  % where does this datapoint lie in the data?
+  locloc = find(min(abs(bloc_diff))==abs(bloc_diff));
+  locloc = locloc(1); % only care about the first ex
+  randomized_cp_diff(i) = tmp_loc - rndlocs(locloc);
+end
+
+
+
+figure(4);
+ksdensity(cell_cp_diff);
+hold on;
+ksdensity(randomized_cp_diff);
+hold off;
