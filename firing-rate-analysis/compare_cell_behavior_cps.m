@@ -1,4 +1,5 @@
 
+if ~(exist('obj', 'var') == 1)
 obj=kinect_extract_findall_objects(pwd,[],'rp', 'pca');
 uuid_list={'faaac17c-7f71-402e-9ab1-4448a991e1b9',...
     '816d2c07-6e2b-4bb4-a344-ca450628da53',...
@@ -8,6 +9,7 @@ uuid_list={'faaac17c-7f71-402e-9ab1-4448a991e1b9',...
     'fd72855d-e504-40ac-9457-c44f69328aae',...
     'bb1b64d9-7d57-4b90-963a-0c053c8de074',...
     'd4e7232c-ca26-4cbc-8963-9c5fab8b33ea'};
+end
 % load('../kube_modeling/inscopix/kubejob_2017-07-29_15-12-10/export_results_6dbe20f3-2151-46fb-b74f-1dd9d2e359d9.mat');
 % obj.load_model_labels(labels,metadata,9);
 % beh=obj.get_behavior_object;
@@ -17,20 +19,21 @@ uuid_list={'faaac17c-7f71-402e-9ab1-4448a991e1b9',...
 
 obj=obj(obj.filter_by_uuid(uuid_list));
 obj = obj(obj.filter_by_mouse('q32'));
-% beh=obj.get_behavior_object;
+beh=obj.get_behavior_object;
 
 cadata=obj.get_imaging;
 
-% reconstruct traces from hifiber
-caraw = zeros(length(cadata.traces), length(cadata.traces(1).raw));
-for i=1:length(cadata.traces)
-  caraw(i, :) = cadata.traces(i).raw;
-end
 
 %%
 
 phan=phanalysis(cadata,beh,obj,'imaging');
 map_time = phan.metadata.time_mappers{1};
+
+% reconstruct traces from hifiber
+caraw = zeros(length(cadata.traces), length(map_time(cadata.traces(1).raw)));
+for i=1:length(cadata.traces)
+  caraw(i, :) = map_time(cadata.traces(i).raw);
+end
 % phan.load_metadata('mouse_metadata.json');
 % phan.set_option('syllable_cutoff',max(find(usage>=.01)));
 % phan.set_option('filter_trace',false);
@@ -76,14 +79,15 @@ map_time = phan.metadata.time_mappers{1};
 % cellSpikes = mat2cell(allSpikes, ones(1, size(allSpikes,1)), size(allSpikes, 2));
 % cellSmoothedSpikes = cellfun(@(x) conv(x, gaussFilter, 'same'), cellSpikes, 'uniformoutput', false);
 % cellSmoothedSpikes = cell2mat(cellSmoothedSpikes);
-deltac = delta_coefficients(zscore(caraw')', 2);
+deltac = delta_coefficients(phanalysis.nanzscore(caraw')', 2);
 
 thresh = 1;
 smooth_sig = 1.5;
 bin_score=abs(deltac)>thresh;
-kernel=normpdf([round(-smooth_sig(i)*6):round(smooth_sig(i)*6)],0,smooth_sig(i));
-smooth_score=conv(mean(bin_score),kernel, 'same');
+kernel=normpdf([round(-smooth_sig*6):round(smooth_sig*6)],0,smooth_sig);
+smooth_score=conv(nanmean(bin_score),kernel, 'same');
 % grab the indices of the changepoints
-[~, locs] = findpeaks(map_time(zscore(smooth_score)), 'minpeakdistance', 4);
+[~, locs] = findpeaks(phanalysis.nanzscore(smooth_score), 'minpeakdistance', 4);
 
 [~, behlocs] = findpeaks(phanalysis.nanzscore(map_time(obj.projections.changepoint_score)), 'minpeakdistance', 4);
+
