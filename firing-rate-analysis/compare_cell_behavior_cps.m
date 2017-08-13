@@ -137,7 +137,7 @@ title('Nearest cellular changepoints');
 print(gcf, '/n/groups/datta/win/dls-data-final/inscopix/nearest-cell-cp', '-dpng')
 
 rng(1);
-numsims = 100;
+numsims = 200;
 randomized_cp_diff = zeros(numsims, length(locs));
 
 for j=1:numsims
@@ -153,10 +153,44 @@ for j=1:numsims
   end
 end
 
-randomized_cp_diff = mean(randomized_cp_diff, 1);
+% randomized_cp_diff = median(randomized_cp_diff, 1);
+randomized_cp_vec = reshape(randomized_cp_diff, [], 1);
 
 figure(4);
-ksdensity(cell_cp_diff);
+[f, xi] = ksdensity(cell_cp_diff);
+[f2, xi2] = ksdensity(randomized_cp_vec);
+plot(xi, f./max(f));
 hold on;
-ksdensity(randomized_cp_diff);
+plot(xi2, f2./max(f2));
 hold off;
+title('normalized densities');
+
+rng(1);
+numsims = 200;
+randomized_cp_diff2 = zeros(numsims, length(locs));
+
+for j=1:numsims
+  rndcps = phanalysis.phase_randomize(smooth_score);
+  [~, rndlocs] = findpeaks(phanalysis.nanzscore(double(rndcps)), 'minpeakdistance', 4);
+  for i=1:length(behlocs)
+    tmp_loc = behlocs(i);
+    bloc_diff = rndlocs - tmp_loc;
+    % where does this datapoint lie in the data?
+    locloc = find(min(abs(bloc_diff))==abs(bloc_diff));
+    locloc = locloc(1); % only care about the first ex
+    randomized_cp_diff2(j, i) = tmp_loc - rndlocs(locloc);
+  end
+end
+
+% randomized_cp_diff = median(randomized_cp_diff, 1);
+randomized_cp_vec2 = reshape(randomized_cp_diff2, [], 1);
+
+figure(5);
+[f, xi] = ksdensity(behavioral_cp_diff);
+[f2, xi2] = ksdensity(randomized_cp_vec2);
+plot(xi, f./max(f));
+hold on;
+plot(xi2, f2./max(f2));
+hold off;
+title('normalized densities');
+
