@@ -137,7 +137,7 @@ title('Nearest cellular changepoints');
 print(gcf, '/n/groups/datta/win/dls-data-final/inscopix/nearest-cell-cp', '-dpng')
 
 rndcps = phanalysis.phase_randomize(cps);
-[~, rndlocs] = findpeaks(phanalysis.nanzscore(rndcps), 'minpeakdistance', 4);
+[~, rndlocs] = findpeaks(phanalysis.nanzscore(double(rndcps)), 'minpeakdistance', 4);
 randomized_cp_diff = [];
 for i=1:length(locs)
   tmp_loc = locs(i);
