@@ -90,9 +90,9 @@ cps = map_time(obj.projections.changepoint_score);
 % grab the indices of the changepoints
 smooth_score = smooth_score(600:end-600);
 cps = cps(600:end-600);
-[~, locs] = findpeaks(phanalysis.nanzscore(smooth_score), 'minpeakdistance', 4);
+[~, locs] = findpeaks(phanalysis.nanzscore(smooth_score), 'minpeakdistance', 4, 'minpeakheight', 0);
 
-[~, behlocs] = findpeaks(phanalysis.nanzscore(cps), 'minpeakdistance', 4);
+[~, behlocs] = findpeaks(phanalysis.nanzscore(cps), 'minpeakdistance', 4, 'minpeakheight', 0);
 
 
 [cor, lags] = xcorr(phanalysis.nanzscore(smooth_score), phanalysis.nanzscore(cps), 'coeff');
@@ -144,7 +144,7 @@ randomized_cp_diff = zeros(numsims, length(locs));
 
 for j=1:numsims
   rndcps = phanalysis.phase_randomize(phanalysis.nanzscore(cps));
-  [~, rndlocs] = findpeaks(phanalysis.nanzscore(double(rndcps)), 'minpeakdistance', 4);
+  [~, rndlocs] = findpeaks(phanalysis.nanzscore(double(rndcps)), 'minpeakdistance', 4, 'minpeakheight', 0);
   for i=1:length(locs)
     tmp_loc = locs(i);
     bloc_diff = rndlocs - tmp_loc;
@@ -171,7 +171,7 @@ randomized_cp_diff2 = zeros(numsims, length(locs));
 
 for j=1:numsims
   rndcps = phanalysis.phase_randomize(phanalysis.nanzscore(smooth_score));
-  [~, rndlocs] = findpeaks(phanalysis.nanzscore(double(rndcps)), 'minpeakdistance', 4);
+  [~, rndlocs] = findpeaks(phanalysis.nanzscore(double(rndcps)), 'minpeakdistance', 4, 'minpeakheight', 0);
   for i=1:length(behlocs)
     tmp_loc = behlocs(i);
     bloc_diff = rndlocs - tmp_loc;
@@ -191,4 +191,3 @@ hold on;
 histogram(randomized_cp_vec2, 'normalization', 'probability');
 hold off;
 title('Nearest cellular changepoints vs rndm');
-
