@@ -91,3 +91,45 @@ smooth_score=conv(nanmean(bin_score),kernel, 'same');
 
 [~, behlocs] = findpeaks(phanalysis.nanzscore(map_time(obj.projections.changepoint_score)), 'minpeakdistance', 4);
 
+cps = map_time(obj.projections.changepoint_score);
+
+[cor, lags] = xcorr(phanalysis.nanzscore(smooth_score), phanalysis.nanzscore(cps), 'coeff');
+% smcor = conv(cor, kernel, 'same');
+figure(1);
+plot(lags, cor);
+xlim([-180 180]);
+xlabel('Lag - Frames');
+ylabel('Corr.')
+
+temporal_diff = [];
+% find the nearest behavioral changepoint from the imaging data
+for i=1:length(locs)
+  tmp_loc = locs(i);
+  bloc_diff = behlocs - tmp_loc;
+  % where does this datapoint lie in the data?
+  locloc = find(min(bloc_diff)==bloc_diff);
+  locloc = locloc(1); % only care about the first ex
+  temporal_diff(i) = tmp_loc - locloc;
+
+end
+
+figure(2);
+ksdensity(temporal_diff);
+title('Nearest behavioral changepoints');
+
+% find the nearest imaging changepoint from the behavioral data
+temporal_diff = [];
+% find the nearest behavioral changepoint from the imaging data
+for i=1:length(behlocs)
+  tmp_loc = behlocs(i);
+  bloc_diff = locs - tmp_loc;
+  % where does this datapoint lie in the data?
+  locloc = find(min(bloc_diff)==bloc_diff);
+  locloc = locloc(1); % only care about the first ex
+  temporal_diff(i) = tmp_loc - locloc;
+
+end
+
+figure(3);
+ksdensity(temporal_diff);
+title('Nearest cellular changepoints');
