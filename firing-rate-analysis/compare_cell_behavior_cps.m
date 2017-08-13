@@ -107,7 +107,7 @@ for i=1:length(locs)
   tmp_loc = locs(i);
   bloc_diff = behlocs - tmp_loc;
   % where does this datapoint lie in the data?
-  locloc = find(min(abs(bloc_diff))==bloc_diff);
+  locloc = find(min(abs(bloc_diff))==abs(bloc_diff));
   locloc = locloc(1); % only care about the first ex
   temporal_diff(i) = i - locloc;
 
@@ -124,7 +124,7 @@ for i=1:length(behlocs)
   tmp_loc = behlocs(i);
   bloc_diff = locs - tmp_loc;
   % where does this datapoint lie in the data?
-  locloc = find(min(abs(bloc_diff))==bloc_diff);
+  locloc = find(min(abs(bloc_diff))==abs(bloc_diff));
   locloc = locloc(1); % only care about the first ex
   temporal_diff(i) = i - locloc;
 
