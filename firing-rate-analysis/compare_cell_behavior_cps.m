@@ -94,7 +94,7 @@ cps = cps(600:end-600);
 
 [~, behlocs] = findpeaks(phanalysis.nanzscore(cps), 'minpeakdistance', 4, 'minpeakheight', 0.75);
 
-edges = [1:10 100 1000];
+edges = [1:20 100 1000];
 figure(1);
 histogram(diff(locs), edges);
 hold on;
