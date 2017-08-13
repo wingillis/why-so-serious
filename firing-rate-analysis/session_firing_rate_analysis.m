@@ -171,7 +171,7 @@ figure(10);
 imagesc(zscore(neuron.C_raw')');
 colormap bone;
 hold on;
-plot(smooth_score./max(smooth_score)./*400, 'g');
+plot(smooth_score./max(smooth_score).*400, 'g');
 hold off;
 
 % detrend and run a periodogram to smooth the data - spectrogram
