@@ -86,11 +86,13 @@ smooth_sig = 1.5;
 bin_score=abs(deltac)>thresh;
 kernel=normpdf([round(-smooth_sig*6):round(smooth_sig*6)],0,smooth_sig);
 smooth_score=conv(nanmean(bin_score),kernel, 'same');
-% grab the indices of the changepoints
-[~, locs] = findpeaks(phanalysis.nanzscore(smooth_score(600:end-600)), 'minpeakdistance', 4);
-
 cps = map_time(obj.projections.changepoint_score);
-[~, behlocs] = findpeaks(phanalysis.nanzscore(cps(600:end-600)), 'minpeakdistance', 4);
+% grab the indices of the changepoints
+smooth_score = smooth_score(600:end-600);
+cps = cps(600:end-600);
+[~, locs] = findpeaks(phanalysis.nanzscore(smooth_score), 'minpeakdistance', 4);
+
+[~, behlocs] = findpeaks(phanalysis.nanzscore(cps), 'minpeakdistance', 4);
 
 
 [cor, lags] = xcorr(phanalysis.nanzscore(smooth_score), phanalysis.nanzscore(cps), 'coeff');
@@ -141,7 +143,7 @@ numsims = 200;
 randomized_cp_diff = zeros(numsims, length(locs));
 
 for j=1:numsims
-  rndcps = phanalysis.phase_randomize(cps);
+  rndcps = phanalysis.phase_randomize(phanalysis.nanzscore(cps));
   [~, rndlocs] = findpeaks(phanalysis.nanzscore(double(rndcps)), 'minpeakdistance', 4);
   for i=1:length(locs)
     tmp_loc = locs(i);
@@ -157,20 +159,18 @@ end
 randomized_cp_vec = reshape(randomized_cp_diff, [], 1);
 
 figure(4);
-[f, xi] = ksdensity(cell_cp_diff);
-[f2, xi2] = ksdensity(randomized_cp_vec);
-plot(xi, f./max(f));
+histogram(cell_cp_diff, 'normalization', 'probability');
 hold on;
-plot(xi2, f2./max(f2));
+histogram(randomized_cp_vec, 'normalization', 'probability');
 hold off;
-title('normalized densities');
+title('Nearest behavioral changepoints vs rndm');
 
 rng(1);
 numsims = 200;
 randomized_cp_diff2 = zeros(numsims, length(locs));
 
 for j=1:numsims
-  rndcps = phanalysis.phase_randomize(smooth_score);
+  rndcps = phanalysis.phase_randomize(phanalysis.nanzscore(smooth_score));
   [~, rndlocs] = findpeaks(phanalysis.nanzscore(double(rndcps)), 'minpeakdistance', 4);
   for i=1:length(behlocs)
     tmp_loc = behlocs(i);
@@ -186,11 +186,9 @@ end
 randomized_cp_vec2 = reshape(randomized_cp_diff2, [], 1);
 
 figure(5);
-[f, xi] = ksdensity(behavioral_cp_diff);
-[f2, xi2] = ksdensity(randomized_cp_vec2);
-plot(xi, f./max(f));
+histogram(behavioral_cp_diff, 'normalization', 'probability');
 hold on;
-plot(xi2, f2./max(f2));
+histogram(randomized_cp_vec2, 'normalization', 'probability');
 hold off;
-title('normalized densities');
+title('Nearest cellular changepoints vs rndm');
 
