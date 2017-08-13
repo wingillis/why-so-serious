@@ -139,7 +139,7 @@ for i=1:numel(thresh)
   bin_score=abs(deltac)>thresh(i);
   kernel=normpdf([round(-smooth_sig(i)*6):round(smooth_sig(i)*6)],0, smooth_sig(i));
   smooth_score=conv(mean(bin_score), kernel, 'same');
-  [pks, locs] = findpeaks(smooth_score, 'minpeakdistance', 4);
+  [pks, locs] = findpeaks(zscore(smooth_score), 'minpeakdistance', 4);
   if isempty(diff(locs))
     peakloc(i) = 0;
   else
@@ -165,10 +165,10 @@ smooth_sig = 1.5;
 bin_score=abs(deltac)>thresh;
 kernel=normpdf([round(-smooth_sig*6):round(smooth_sig*6)],0, smooth_sig);
 smooth_score=conv(mean(bin_score), kernel, 'same');
-[pks, locs] = findpeaks(smooth_score, 'minpeakdistance', 4);
+[pks, locs] = findpeaks(zscore(smooth_score), 'minpeakdistance', 4);
 
 figure(10);
-imagesc(zscore(neuron.C_raw')');
+imagesc(flipud(zscore(neuron.C_raw')'));
 colormap bone;
 hold on;
 plot(smooth_score./max(smooth_score).*400, 'g');
