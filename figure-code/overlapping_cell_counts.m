@@ -9,17 +9,21 @@ function overlapping_cell_counts()
     values(i,:) = values(i,:) ./ totals(i);
   end
   f = figure();
-  hold on;
   bar(1, mean(values(:,1)), 'facecolor', [228 235 25]./255);
+  hold on;
   bar(2, mean(values(:,2)), 'facecolor', [1 0 0]);
   bar(3, mean(values(:,3)), 'facecolor', [0 1 0]);
-  errorbar(1:3, mean(values, 1), std(values, [], 1), 'k.')
+  mv = mean(values, 1);
+  stdv = std(values, [], 1);
+  % errorbar(1:3, mean(values, 1), std(values, [], 1), 'k.')
+  plot(repmat([1 2 3], 2, 1), [mv + stdv; mv - stdv], 'k');
   xticks(1:3)
-  xticklabels({'both (n=45)', 'd1 (n=485)', 'd2 (n=635)'});
-  set(gca, 'fontsize', 4);
+  xticklabels({'Both (n=45)', 'D1 (n=485)', 'D2 (n=635)'});
+  set(gca, 'fontsize', 8, 'xticklabelrotation', 90);
   ylabel('proportion per sample');
+  box off;
   f.PaperUnits = 'inches';
-  f.PaperPosition = [0 0 1.5 2];
+  f.PaperPosition = [0 0 1.5 3];
   saveas(f, '/Users/wgillis/Dropbox (HMS)/lab-datta/projects/dls-function/paper/figs/cre-on-off overlap/overlapping-cell-count', 'epsc');
   savefig(f, '/Users/wgillis/Dropbox (HMS)/lab-datta/projects/dls-function/paper/figs/cre-on-off overlap/overlapping-cell-count');
   print(f, '/Users/wgillis/Dropbox (HMS)/lab-datta/projects/dls-function/paper/figs/cre-on-off overlap/overlapping-cell-count', '-r300', '-dtiff');

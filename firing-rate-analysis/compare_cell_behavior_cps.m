@@ -71,17 +71,20 @@ cps = map_time(obj.projections.changepoint_score);
 % grab the indices of the changepoints
 smooth_score = smooth_score(600:end-600);
 cps = cps(600:end-600);
-[~, locs] = findpeaks(phanalysis.nanzscore(smooth_score), 'minpeakdistance', 4, 'minpeakheight', 0.75);
+[~, locs] = findpeaks(phanalysis.nanzscore(smooth_score), 'minpeakdistance', 4, 'minpeakheight', 0.5);
 
-[~, behlocs] = findpeaks(phanalysis.nanzscore(cps), 'minpeakdistance', 4, 'minpeakheight', 1);
+[~, behlocs] = findpeaks(phanalysis.nanzscore(cps), 'minpeakdistance', 4, 'minpeakheight', 1.2);
 
-edges = [1:20 100 1000];
+edges = [linspace(0, 40, 200) 100 1000];
 figure(1);
-histogram(diff(locs), edges);
+% histogram(diff(locs), edges);
+ksdensity(diff(locs), edges);
 hold on;
-histogram(diff(behlocs), edges);
+ksdensity(diff(behlocs), edges);
+% histogram(diff(behlocs), edges);
 hold off;
-xlim([0 20]);
+legend({'cell cps', 'behavior cps'})
+xlim([0 40]);
 
 [cor, lags] = xcorr(phanalysis.nanzscore(smooth_score), phanalysis.nanzscore(cps), 'coeff');
 % smcor = conv(cor, kernel, 'same');
@@ -106,7 +109,7 @@ end
 figure(3);
 ksdensity(cell_cp_diff);
 title('Nearest behavioral changepoints');
-print(gcf, '/n/groups/datta/win/dls-data-final/inscopix/nearest-behavior-cp', '-dpng')
+% print(gcf, '/n/groups/datta/win/dls-data-final/inscopix/nearest-behavior-cp', '-dpng')
 
 % find the nearest imaging changepoint from the behavioral data
 behavioral_cp_diff = [];
@@ -124,7 +127,7 @@ end
 figure(4);
 ksdensity(behavioral_cp_diff);
 title('Nearest cellular changepoints');
-print(gcf, '/n/groups/datta/win/dls-data-final/inscopix/nearest-cell-cp', '-dpng')
+% print(gcf, '/n/groups/datta/win/dls-data-final/inscopix/nearest-cell-cp', '-dpng')
 
 rng(1);
 numsims = 20;
@@ -147,11 +150,15 @@ end
 randomized_cp_vec = reshape(randomized_cp_diff, [], 1);
 
 figure(5);
-histogram(cell_cp_diff, 'normalization', 'probability');
+ksdensity(abs(cell_cp_diff), edges);
+% histogram(cell_cp_diff, 'normalization', 'probability');
 hold on;
-histogram(randomized_cp_vec, 'normalization', 'probability');
+ksdensity(abs(randomized_cp_vec), edges);
+% histogram(randomized_cp_vec, 'normalization', 'probability');
 hold off;
+legend({'cell diff', 'rndm'})
 title('Nearest behavioral changepoints vs rndm');
+xlim([0 50]);
 
 rng(1);
 numsims = 20;
@@ -174,9 +181,37 @@ end
 randomized_cp_vec2 = reshape(randomized_cp_diff2, [], 1);
 
 figure(6);
-histogram(behavioral_cp_diff, 'normalization', 'probability');
+ksdensity(abs(behavioral_cp_diff), edges);
+% histogram(behavioral_cp_diff, 'normalization', 'probability');
 hold on;
-histogram(randomized_cp_vec2, 'normalization', 'probability');
+ksdensity(abs(randomized_cp_vec2), edges);
+% histogram(randomized_cp_vec2, 'normalization', 'probability');
 hold off;
 title('Nearest cellular changepoints vs rndm');
+xlim([0 50]);
 
+
+rng(1);
+numsims = 20;
+randomized_cp_diff3 = zeros(numsims, length(locs));
+
+for j=1:numsims
+  rndcps = cps(randi(length(cps), [1 length(cps)]));
+  [~, rndpeaks] = findpeaks(phanalysis.nanzscore(double(rndcps)), 'minpeakdistance', 4, 'minpeakheight', 0.8);
+  for i=1:length(locs)
+    tmp_loc = locs(i);
+    bloc_diff = rndlocs - tmp_loc;
+    % where does this datapoint lie in the data?
+    locloc = find(min(abs(bloc_diff))==abs(bloc_diff));
+    locloc = locloc(1); % only care about the first ex
+    randomized_cp_diff3(j, i) = tmp_loc - rndlocs(locloc);
+  end
+end
+
+newedges = [-1000 -100 linspace(-50, 50, 400) 100 1000];
+figure(7);
+ksdensity(abs(cell_cp_diff), newedges);
+hold on;
+ksdensity(abs(randomized_cp_diff3(:)), newedges);
+hold off;
+xlim([-50 50]);

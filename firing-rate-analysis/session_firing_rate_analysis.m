@@ -1,3 +1,6 @@
+if exist('caraw', 'var') == 1
+  neuron.C_raw = caraw;
+end
 
 if ~(exist('neuron', 'var') == 1)
   error('No neuron loaded');
@@ -116,34 +119,34 @@ if false
   zlim([0 60]);
 end
 
-sigma = 0.43; % the changepoint distance doesn't change much with different smoothings
-sz = 50;    % length of gaussFilter vector
-x = linspace(-sz / 2, sz / 2, sz);
-gaussFilter = exp(-x .^ 2 / (2 * sigma ^ 2));
-gaussFilter = gaussFilter / sum (gaussFilter);
-cellSpikes = mat2cell(allSpikes, ones(1, size(allSpikes,1)), size(allSpikes, 2));
-cellSmoothedSpikes = cellfun(@(x) conv(x, gaussFilter, 'same'), cellSpikes, 'uniformoutput', false);
-cellSmoothedSpikes = cell2mat(cellSmoothedSpikes);
+% sigma = 0.43; % the changepoint distance doesn't change much with different smoothings
+% sz = 50;    % length of gaussFilter vector
+% x = linspace(-sz / 2, sz / 2, sz);
+% gaussFilter = exp(-x .^ 2 / (2 * sigma ^ 2));
+% gaussFilter = gaussFilter / sum (gaussFilter);
+% cellSpikes = mat2cell(allSpikes, ones(1, size(allSpikes,1)), size(allSpikes, 2));
+% cellSmoothedSpikes = cellfun(@(x) conv(x, gaussFilter, 'same'), cellSpikes, 'uniformoutput', false);
+% cellSmoothedSpikes = cell2mat(cellSmoothedSpikes);
 deltac = delta_coefficients(zscore(neuron.C_raw')', 2);
 
 % changepoint analysis on point-process spiking information
 peakloc = [];
-resolution = 35;
+resolution = 45;
 smoothing_opts = linspace(0, 4, resolution);
 thresh_opts = linspace(0, 2.5, resolution);
 [smooth_sig, thresh] = ndgrid(smoothing_opts, thresh_opts);
-
+edges = [linspace(0, 50, 200) 100 1000];
 
 for i=1:numel(thresh)
 
   bin_score=abs(deltac)>thresh(i);
   kernel=normpdf([round(-smooth_sig(i)*6):round(smooth_sig(i)*6)],0, smooth_sig(i));
   smooth_score=conv(mean(bin_score), kernel, 'same');
-  [pks, locs] = findpeaks(zscore(smooth_score), 'minpeakdistance', 4);
+  [pks, locs] = findpeaks(zscore(smooth_score), 'minpeakdistance', 4, 'minpeakheight', 0.75);
   if isempty(diff(locs))
     peakloc(i) = 0;
   else
-    [f, xi] = ksdensity(diff(locs));
+    [f, xi] = ksdensity(diff(locs), edges);
     tmp = xi(find(max(f)==f));
     peakloc(i) = tmp(1);
   end
