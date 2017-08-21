@@ -27,4 +27,10 @@ function grin_movie_stats(matname, outfile)
   imwrite(mat2gray(img, ptile(img)), fullfile(basename, [outfile '-dff.png']), 'png');
   imwrite(mat2gray(double(maxframe), ptile(double(maxframe))), fullfile(basename, [outfile '-max.png']), 'png');
   imwrite(mat2gray(meanframe, ptile(meanframe)), fullfile(basename, [outfile '-mean.png']), 'png');
+  % try out different ways of building the max projection image
+  imwrite(mat2gray(double(maxframe), [min(double(maxframe(:))) max(double(maxframe(:)))]), fullfile(basename, [outfile '-max0.png']), 'png');
+  imwrite(mat2gray(double(maxframe), ptile(double(maxframe)).*[1 1.05]), fullfile(basename, [outfile '-max1.png']), 'png');
+  imwrite(mat2gray(double(maxframe), ptile(double(maxframe)).*[0.95 1.1]), fullfile(basename, [outfile '-max2.png']), 'png');
+  imwrite(mat2gray(double(maxframe), ptile(double(maxframe)).*[0.9 1.15]), fullfile(basename, [outfile '-max3.png']), 'png');
+
 end % function
