@@ -4,9 +4,11 @@ function roi_stackplot(movie_fname, cnmfe_fname, savefolder)
   load(cnmfe_fname);
   mf = matfile(movie_fname);
   % img = dff(mf, 9000);
-  img = mean(double(mf.Y(:,:,1:9000)), 3);
+  img = mean(double(mf.Y(:,:,1:9900)), 3);
   ptile = @(x) [prctile(x(:), 0.5) prctile(x(:), 99.5)];
   img = mat2gray(img, ptile(img));
+
+  % figure 1
   f1 = figure();
   imshow(repmat(img, 1, 1, 3));
   hold on;
@@ -15,6 +17,8 @@ function roi_stackplot(movie_fname, cnmfe_fname, savefolder)
     set(h, 'AlphaData', reshape(neuron.A(:,i), d1, d2));
   end
   hold off;
+  frame1 = getframe(gcf);
+  f1_img = frame1.CData;
 
   f2 = figure();
   data = neuron.C_raw(num_plots:2*num_plots, :);
