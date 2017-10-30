@@ -114,7 +114,7 @@ kt = 3;                 % number of frames to be skipped in final movie
 % parameters for computation
 comp_params = struct('memory_size_to_use', 15, ... % in GB
 										 'memory_size_per_patch', 1, ... % in GB
-										 'patch_dims', [128, 128], ...
+										 'patch_dims', [64, 64], ...
 										 'batch_frames', 4000);
 
 % initialize the neuron here:
