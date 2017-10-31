@@ -214,12 +214,12 @@ cnmfe_path = neuron.save_workspace();
 Coor = neuron.show_contours(0.6);
 
 %% create a video for displaying the
-amp_ac = 140;
-range_ac = 5+[0, amp_ac];
-multi_factor = 10;
-range_Y = 1300+[0, amp_ac*multi_factor];
-
-avi_filename = neuron.show_demixed_video(save_demixed, kt, [], amp_ac, range_ac, range_Y, multi_factor);
+% amp_ac = 140;
+% range_ac = 5+[0, amp_ac];
+% multi_factor = 10;
+% range_Y = 1300+[0, amp_ac*multi_factor];
+% 
+% avi_filename = neuron.show_demixed_video(save_demixed, kt, [], amp_ac, range_ac, range_Y, multi_factor);
 
 %% save neurons shapes
 neuron.save_neurons();
