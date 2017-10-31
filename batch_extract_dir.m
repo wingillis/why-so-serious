@@ -112,8 +112,8 @@ save_demixed = true;    % save the demixed file or not
 kt = 3;                 % number of frames to be skipped in final movie
 
 % parameters for computation
-comp_params = struct('memory_size_to_use', 20, ... % in GB
-										 'memory_size_per_patch', 4, ... % in GB
+comp_params = struct('memory_size_to_use', 30, ... % in GB
+										 'memory_size_per_patch', 5, ... % in GB
 										 'patch_dims', [64, 64], ...
 										 'batch_frames', 4000);
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -n 1
-#SBATCH --mem=32G
+#SBATCH --mem=42G
 #SBATCH -p short
 #SBATCH -t 11:00:00
 #SBATCH --mail-type=END
@@ -8,9 +8,9 @@
 
 # set up so that you can run any quick matlab command thru slurm
 
+module unload matlab/2016b
 module load matlab/2017a
-#module load matlab/2016b
-cnmfepat="${HOME}/code/CNMF_E"
+cnmfepath="${HOME}/code/CNMF_E"
 grinpath="${HOME}/code/grin-analysis"
 classpath="${HOME}/code/grin-class"
 echo "$(pwd)"
