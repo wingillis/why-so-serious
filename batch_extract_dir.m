@@ -86,7 +86,7 @@ merge_thr_spatial = [0.8, 0.2, -inf];  % merge components with highly correlated
 
 % -------------------------  INITIALIZATION   -------------------------  %
 K = [];             % maximum number of neurons per patch. when K=[], take as many as possible.
-min_corr = 0.8;     % minimum local correlation for a seeding pixel
+min_corr = 0.7;     % minimum local correlation for a seeding pixel
 min_pnr = 8;       % minimum peak-to-noise ratio for a seeding pixel
 min_pixel = gSig^2;      % minimum number of nonzero pixels for each neuron
 bd = 0;             % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
@@ -179,18 +179,18 @@ if update_sn
 else
     neuron.update_spatial_parallel(use_parallel);
 end
-% merge neurons based on correlations 
+% merge neurons based on correlations
 neuron.merge_high_corr(show_merge, merge_thr_spatial);
 
 % TODO: why does m only go up to 2?
 for m=1:2
     % update temporal
     neuron.update_temporal_parallel(use_parallel);
-    
+
     % delete bad neurons
     neuron.remove_false_positives();
-    
-    % merge neurons based on temporal correlation + distances 
+
+    % merge neurons based on temporal correlation + distances
     neuron.merge_neurons_dist_corr(show_merge);
 end
 
@@ -218,7 +218,7 @@ Coor = neuron.show_contours(0.6);
 % range_ac = 5+[0, amp_ac];
 % multi_factor = 10;
 % range_Y = 1300+[0, amp_ac*multi_factor];
-% 
+%
 % avi_filename = neuron.show_demixed_video(save_demixed, kt, [], amp_ac, range_ac, range_Y, multi_factor);
 
 %% save neurons shapes
