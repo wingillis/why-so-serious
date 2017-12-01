@@ -1,0 +1,14 @@
+#!/bin/bash
+#SBATCH -n 1
+#SBATCH --mem=16G
+#SBATCH -p medium
+#SBATCH -t 12:00:00
+#SBATCH --mail-type=END
+#SBATCH --mail-user=wgillis@g.harvard.edu
+
+# downsample the tif data and memmap it
+module unload matlab/2016b
+module load matlab/2017a
+cnmfepath="${HOME}/code/CNMF_E"
+grinpath="${HOME}/code/grin-analysis"
+matlab -r "addpath(genpath('${grinpath}')); addpath(genpath('${cnmfepath}')); memmap_file_sequence('.', '$1', 4);"
