@@ -9,7 +9,12 @@
 # use cnmfe to extract neurons from a dataset
 # this assumes you are using the new version of CNMF_E
 
-module unload matlab/2016b
-module load matlab/2017a
 codepath="${HOME}/code"
-matlab -r "addpath(genpath('${code}')); cnmfe_extract('$1');"
+module unload matlab/2016b
+module load matlab/2017b
+if [ -f cnmfe.config ]
+  . ./cnmfe.config
+  matlab -r "addpath(genpath('${code}')); cnmfe_extract('$1', $spatial, $temporal);"
+else
+  matlab -r "addpath(genpath('${code}')); cnmfe_extract('$1');"
+fi
