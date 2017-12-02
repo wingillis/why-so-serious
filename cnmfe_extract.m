@@ -1,8 +1,10 @@
 function cnmfe_extract(fname)
+	mf = matfile(fname, 'writable', true);
+	mf.Ysiz = mf.sizY;
 
 	%% choose multiple datasets or just one  
 	neuron = Sources2D(); 
-	nams = neuron.select_file(fname);  %if nam is [], then select data interactively 
+	nams = neuron.select_multiple_files({fname});  %if nam is [], then select data interactively 
 	
 	%% parameters  
 	% -------------------------    COMPUTATION    -------------------------  %
@@ -11,9 +13,9 @@ function cnmfe_extract(fname)
 	    'patch_dims', [64, 64],...  %GB, patch size 
 	    'batch_frames', 2000);           % number of frames per batch 
 	  % -------------------------      SPATIAL      -------------------------  %
-	gSig = 3;           % pixel, gaussian width of a gaussian kernel for filtering the data. 0 means no filtering
-	gSiz = 13;          % pixel, neuron diameter
-	ssub = 1;           % spatial downsampling factor
+	gSig = 3;  % pixel, gaussian width of a gaussian kernel for filtering the data. 0 means no filtering
+	gSiz = 13; % pixel, neuron diameter
+	ssub = 1;  % spatial downsampling factor
 	with_dendrites = false;   % with dendrites or not
 	if with_dendrites
 	    % determine the search locations by dilating the current neuron shapes

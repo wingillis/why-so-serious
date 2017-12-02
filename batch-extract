@@ -12,4 +12,4 @@
 module unload matlab/2016b
 module load matlab/2017a
 codepath="${HOME}/code"
-matlab -r "addpath(genpath('${code}')); parpool(6); cnmfe_extract('$1');"
+matlab -r "addpath(genpath('${code}')); cnmfe_extract('$1');"
