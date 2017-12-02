@@ -1,0 +1,15 @@
+#!/bin/bash
+#SBATCH -n 6
+#SBATCH --mem=50G
+#SBATCH -p medium
+#SBATCH -t 18:00:00
+#SBATCH --mail-type=END
+#SBATCH --mail-user=wgillis@g.harvard.edu
+
+# use cnmfe to extract neurons from a dataset
+# this assumes you are using the new version of CNMF_E
+
+module unload matlab/2016b
+module load matlab/2017a
+codepath="${HOME}/code"
+matlab -r "addpath(genpath('${code}')); parpool(6); cnmfe_extract('$1');"
