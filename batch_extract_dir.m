@@ -1,10 +1,15 @@
+function batch_extract_dir(glob_pattern)
 %% this script is intended for the new version of cnmfe - which includes better memory management
 % as well as batch processing built-in
 
 neuron = Sources2D();
 
 % get filenames from the current dir and subdirs
-fnames = dir('recording*-downsample4x.mat');
+if nargin > 0
+  fnames = dir(glob_pattern);
+else
+  fnames = dir('recording*-downsample4x.mat');
+end
 % for now, default to the first found file
 fname = fullfile(fnames(1).folder, fnames(1).name);
 
@@ -223,3 +228,4 @@ Coor = neuron.show_contours(0.6);
 
 %% save neurons shapes
 neuron.save_neurons();
+end % function

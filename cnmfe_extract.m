@@ -1,20 +1,28 @@
-function cnmfe_extract(fname)
+function cnmfe_extract(fname, spatial_thresh, temporal_thresh)
+	%% extract neurons from an inscopix recording using the new version of CNMF_E
+	if nargin < 2
+		spatial_thresh = 0.7;
+	end
+	if nargin < 3
+		temporal_thresh = 0.1;
+	end
+
 	mf = matfile(fname, 'writable', true);
 	mf.Ysiz = mf.sizY;
 
-	%% choose multiple datasets or just one  
-	neuron = Sources2D(); 
-	nams = neuron.select_multiple_files({fname});  %if nam is [], then select data interactively 
-	
-	%% parameters  
+	%% choose multiple datasets or just one
+	neuron = Sources2D();
+	nams = neuron.select_multiple_files({fname});  %if nam is [], then select data interactively
+
+	%% parameters
 	% -------------------------    COMPUTATION    -------------------------  %
-	pars_envs = struct('memory_size_to_use', 40, ...   % GB, memory space you allow to use in MATLAB 
-	    'memory_size_per_patch', 4, ...   % GB, space for loading data within one patch 
-	    'patch_dims', [64, 64],...  %GB, patch size 
-	    'batch_frames', 2000);           % number of frames per batch 
+	pars_envs = struct('memory_size_to_use', 40, ...   % GB, memory space you allow to use in MATLAB
+	    'memory_size_per_patch', 5, ...   % GB, space for loading data within one patch
+	    'patch_dims', [64, 64],...  %GB, patch size
+	    'batch_frames', 3000);           % number of frames per batch
 	  % -------------------------      SPATIAL      -------------------------  %
-	gSig = 3;  % pixel, gaussian width of a gaussian kernel for filtering the data. 0 means no filtering
-	gSiz = 13; % pixel, neuron diameter
+	gSig = 4.5;  % pixel, gaussian width of a gaussian kernel for filtering the data. 0 means no filtering
+	gSiz = 15; % pixel, neuron diameter
 	ssub = 1;  % spatial downsampling factor
 	with_dendrites = false;   % with dendrites or not
 	if with_dendrites
@@ -30,7 +38,7 @@ function cnmfe_extract(fname)
 	end
 	spatial_constraints = struct('connected', true, 'circular', false);  % you can include following constraints: 'circular'
 	spatial_algorithm = 'hals';
-	
+
 	% -------------------------      TEMPORAL     -------------------------  %
 	Fs = 30;             % frame rate
 	tsub = 1;           % temporal downsampling factor
@@ -40,11 +48,11 @@ function cnmfe_extract(fname)
 	    'optimize_pars', true, ...  % optimize AR coefficients
 	    'optimize_b', true, ...% optimize the baseline);
 	    'max_tau', 100);    % maximum decay time (unit: frame);
-	
+
 	nk = 3;             % detrending the slow fluctuation. usually 1 is fine (no detrending)
 	% when changed, try some integers smaller than total_frame/(Fs*30)
 	detrend_method = 'spline';  % compute the local minimum as an estimation of trend.
-	
+
 	% -------------------------     BACKGROUND    -------------------------  %
 	bg_model = 'ring';  % model of the background {'ring', 'svd'(default), 'nmf'}
 	nb = 1;             % number of background sources for each patch (only be used in SVD and NMF model)
@@ -52,19 +60,19 @@ function cnmfe_extract(fname)
 	ring_radius = round(bg_neuron_factor * gSiz);  % when the ring model used, it is the radius of the ring used in the background model.
 	%otherwise, it's just the width of the overlapping area
 	num_neighbors = 50; % number of neighbors for each neuron
-	
+
 	% -------------------------      MERGING      -------------------------  %
 	show_merge = false;  % if true, manually verify the merging step
 	merge_thr = 0.65;     % thresholds for merging neurons; [spatial overlap ratio, temporal correlation of calcium traces, spike correlation]
 	method_dist = 'max';   % method for computing neuron distances {'mean', 'max'}
 	dmin = 5;       % minimum distances between two neurons. it is used together with merge_thr
 	dmin_only = 2;  % merge neurons if their distances are smaller than dmin_only.
-	merge_thr_spatial = [0.8, 0.4, -inf];  % merge components with highly correlated spatial shapes (corr=0.8) and small temporal correlations (corr=0.1)
-	
+	merge_thr_spatial = [spatial_thresh, temporal_thresh, -inf];  % merge components with highly correlated spatial shapes (corr=0.8) and small temporal correlations (corr=0.1)
+
 	% -------------------------  INITIALIZATION   -------------------------  %
 	K = [];             % maximum number of neurons per patch. when K=[], take as many as possible.
-	min_corr = 0.8;     % minimum local correlation for a seeding pixel
-	min_pnr = 8;       % minimum peak-to-noise ratio for a seeding pixel
+	min_corr = 0.75;     % minimum local correlation for a seeding pixel
+	min_pnr = 12;       % minimum peak-to-noise ratio for a seeding pixel
 	min_pixel = gSig^2;      % minimum number of nonzero pixels for each neuron
 	bd = 0;             % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
 	frame_range = [];   % when [], uses all frames
@@ -74,19 +82,19 @@ function cnmfe_extract(fname)
 	choose_params = false; % manually choose parameters
 	center_psf = true;  % set the value as true when the background fluctuation is large (usually 1p data)
 	% set the value as false when the background fluctuation is small (2p)
-	
+
 	% -------------------------  Residual   -------------------------  %
 	min_corr_res = 0.7;
 	min_pnr_res = 6;
 	seed_method_res = 'auto';  % method for initializing neurons from the residual
 	update_sn = true;
-	
+
 	% ----------------------  WITH MANUAL INTERVENTION  --------------------  %
 	with_manual_intervention = false;
-	
+
 	% -------------------------  FINAL RESULTS   -------------------------  %
 	save_demixed = true;    % save the demixed file or not
-	
+
 	% -------------------------    UPDATE ALL    -------------------------  %
 	neuron.updateParams('gSig', gSig, ...       % -------- spatial --------
 	    'gSiz', gSiz, ...
@@ -114,33 +122,56 @@ function cnmfe_extract(fname)
 	    'bd', bd, ...
 	    'center_psf', center_psf);
 	neuron.Fs = Fs;
-	
-	%% distribute data and be ready to run source extraction 
-	neuron.getReady_batch(pars_envs); 
-	
-	%% initialize neurons in batch mode 
-	neuron.initComponents_batch(K, save_initialization, use_parallel); 
-	
+
+	% CHANGED: from batch mode
+	%% distribute data and be ready to run source extraction
+	neuron.getReady(pars_envs);
+
+	%% initialize neurons from the video data within a selected temporal range
+	if choose_params
+	  % change parameters for optimized initialization
+	  [gSig, gSiz, ring_radius, min_corr, min_pnr] = neuron.set_parameters();
+	end
+
+	%% initialize neurons in batch mode
+	use_prev = false; % turn off using previous initializations
+	[center, Cn, PNR] = neuron.initComponents_parallel(K, frame_range, save_initialization, use_parallel, use_prev);
+
+	neuron.compactSpatial();
+
+	neuron.update_background_parallel(use_parallel);
+
+	neuron.merge_neurons_dist_corr(show_merge);
+	neuron.merge_high_corr(show_merge, merge_thr_spatial);
+
 	%% udpate spatial components for all batches
-	neuron.update_spatial_batch(use_parallel); 
-	
-	%% udpate temporal components for all bataches
-	neuron.update_temporal_batch(use_parallel); 
-	
-	%% update background 
-	neuron.update_background_batch(use_parallel); 
-	
-	%% delete neurons 
-	
-	%% merge neurons 
-	
-	%% get the correlation image and PNR image for all neurons 
-	neuron.correlation_pnr_batch(); 
-	
-	%% concatenate temporal components 
-	neuron.concatenate_temporal_batch(); 
-	neuron.viewNeurons([],neuron.C_raw); 
-	
-	%% save workspace 
-	neuron.save_workspace_batch(); 
+	neuron.update_spatial_parallel(use_parallel);
+
+	for m=1:2
+	  % update temporal
+	  neuron.update_temporal_parallel(use_parallel);
+
+	  % delete bad neurons
+	  neuron.remove_false_positives();
+
+	  % merge neurons based on temporal correlation + distances
+	  neuron.merge_neurons_dist_corr(show_merge);
+	end
+
+	%% update background
+	neuron.update_background_parallel(use_parallel);
+
+	%% delete neurons
+	neuron.remove_false_positives();
+
+	%% merge neurons
+	neuron.merge_neurons_dist_corr(show_merge);
+	neuron.merge_high_corr(show_merge, merge_thr_spatial);
+
+	%% get the correlation image and PNR image for all neurons
+	neuron.correlation_pnr_parallel();
+
+	%% save workspace
+	neuron.save_workspace();
+	neuron.save_neurons();
 end % function

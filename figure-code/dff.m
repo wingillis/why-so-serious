@@ -22,7 +22,7 @@ function [img]=dff(mf, numframes)
 
   img = (double(maxframe) - meanframe) ./ meanframe;
 
-  ptile = @(x) [prctile(x(:), 0.5) prctile(x(:), 99.5)];
+  ptile = @(x) [prctile(x(:), 5) prctile(x(:), 95)];
 
   img = mat2gray(img, ptile(img));
 
