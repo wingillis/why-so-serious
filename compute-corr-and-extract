@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env zsh
 set -e
 
 srun -n 1 -c 5 --mem=20G -p interactive -t 2:00:00 --x11 --pty batch-correlation $1
