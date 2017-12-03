@@ -13,4 +13,4 @@
 codepath="${HOME}/code"
 module unload matlab/2016b
 module load matlab/2017b
-matlab -r "addpath(genpath('${code}')); cnmfe_correlation_bounds('$1');"
+matgraph -r "addpath(genpath('${code}')); cnmfe_correlation_bounds('$1');"
