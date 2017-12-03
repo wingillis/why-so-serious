@@ -14,7 +14,7 @@ module unload matlab/2016b
 module load matlab/2017b
 if [ -f cnmfe.config ]; then
   . ./cnmfe.config
-  matlab -r "addpath(genpath('${code}')); cnmfe_extract('$1', $spatial, $temporal);"
+  matlab -r "addpath(genpath('${code}')); cnmfe_extract('$1', $spatial, $temporal, $min_corr, $min_pnr);"
 else
   matlab -r "addpath(genpath('${code}')); cnmfe_extract('$1');"
 fi

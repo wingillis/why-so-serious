@@ -1,10 +1,16 @@
-function cnmfe_extract(fname, spatial_thresh, temporal_thresh)
+function cnmfe_extract(fname, spatial_thresh, temporal_thresh, min_corr, min_pnr)
 	%% extract neurons from an inscopix recording using the new version of CNMF_E
 	if nargin < 2
 		spatial_thresh = 0.7;
 	end
 	if nargin < 3
 		temporal_thresh = 0.1;
+	end
+	if nargin < 4
+		min_corr = 0.75;     % minimum local correlation for a seeding pixel
+	end
+	if nargin < 5
+		min_pnr = 12;       % minimum peak-to-noise ratio for a seeding pixel
 	end
 
 	mf = matfile(fname, 'writable', true);
@@ -71,8 +77,9 @@ function cnmfe_extract(fname, spatial_thresh, temporal_thresh)
 
 	% -------------------------  INITIALIZATION   -------------------------  %
 	K = [];             % maximum number of neurons per patch. when K=[], take as many as possible.
-	min_corr = 0.75;     % minimum local correlation for a seeding pixel
-	min_pnr = 12;       % minimum peak-to-noise ratio for a seeding pixel
+	% these two are defined at the top of the function now
+	% min_corr = 0.75;     % minimum local correlation for a seeding pixel
+	% min_pnr = 12;       % minimum peak-to-noise ratio for a seeding pixel
 	min_pixel = gSig^2;      % minimum number of nonzero pixels for each neuron
 	bd = 0;             % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
 	frame_range = [];   % when [], uses all frames
