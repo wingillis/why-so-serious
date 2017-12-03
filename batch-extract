@@ -8,6 +8,8 @@
 
 # use cnmfe to extract neurons from a dataset
 # this assumes you are using the new version of CNMF_E
+# the config file is executable by the shell and can be added into the
+# extract function to customize threshold levels
 
 codepath="${HOME}/code"
 module unload matlab/2016b
