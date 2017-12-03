@@ -1,5 +1,9 @@
 function cnmfe_correlation_bounds(fname)
 	%% use this function to calculate the detection thresholds interactively for cnmfe
+
+	mf = matfile(fname, 'writable', true);
+	mf.Ysiz = mf.sizY;
+
 	neuron = Sources2D();
 	nams = neuron.select_multiple_files({fname});  %if nam is [], then select data interactively
 	pars_envs = struct('memory_size_to_use', 30, ...   % GB, memory space you allow to use in MATLAB

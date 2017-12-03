@@ -180,6 +180,6 @@ function cnmfe_extract(fname, spatial_thresh, temporal_thresh, min_corr, min_pnr
 
 	%% save workspace
 	% neuron.save_workspace();
-	neuron.save_results();
+	neuron.save_results(sprintf('neuron-extract_%s', fname));
 	neuron.save_neurons();
 end % function
