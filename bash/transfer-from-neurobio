@@ -1,0 +1,3 @@
+#!/bin/bash
+
+slorc -l transfer -c "rsync -avr /files/Neurobio/DattaLab/win/inscopix/new-grin-data/ /n/groups/datta/win/inscopix/new-grin-data/"
