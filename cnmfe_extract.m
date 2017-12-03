@@ -179,6 +179,7 @@ function cnmfe_extract(fname, spatial_thresh, temporal_thresh, min_corr, min_pnr
 	neuron.correlation_pnr_parallel();
 
 	%% save workspace
-	neuron.save_workspace();
+	% neuron.save_workspace();
+	neuron.save_results();
 	neuron.save_neurons();
 end % function
