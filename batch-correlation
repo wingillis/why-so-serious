@@ -1,7 +1,8 @@
 #!/bin/bash
 #SBATCH -n 2
 #SBATCH --mem=20G
-#SBATCH -p priority
+#SBATCH -p interactive
+#SBATCH --pty
 #SBATCH -t 8:00:00
 #SBATCH --mail-type=END
 #SBATCH --mail-user=wgillis@g.harvard.edu
