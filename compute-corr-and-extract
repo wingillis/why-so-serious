@@ -1,0 +1,4 @@
+#!/bin/bash
+
+srun batch-correlation $1
+sbatch batch-extraction $1

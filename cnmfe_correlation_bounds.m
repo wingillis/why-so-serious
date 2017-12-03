@@ -1,4 +1,5 @@
 function cnmfe_correlation_bounds(fname)
+	%% use this function to calculate the detection thresholds interactively for cnmfe
 	neuron = Sources2D();
 	nams = neuron.select_multiple_files({fname});  %if nam is [], then select data interactively
 
@@ -124,6 +125,14 @@ function cnmfe_correlation_bounds(fname)
 	axis equal off tight;
 	title('PNR image');
 
+	min_corr = input('What is the min correlation? ');
+	min_pnr = input('What is the min pnr? ');
+	spatial = input('What spatial merging threshold? (a good number=0.8) ');
+	temporal = input('What temporal merging threshold? (a good number=0.1-0.4) ');
+
+	f = fopen('cnmfe.config', 'w');
+	fprintf(f, 'min_corr=%f\nmin_pnr=%f\nspatial=%f\ntemporal=%f\n', min_corr, min_pnr, spatial, temporal);
+	fclose(f);
 	savefig(fig, 'correlation-pnr');
 	print(fig, 'correlation-pnr', '-dpng', '-r300');
 
