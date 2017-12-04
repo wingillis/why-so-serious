@@ -16,7 +16,7 @@ function cnmfe_compute_background(recfile, neuronfile)
     index = (i-1)*1000+1:i*1000;
     Y = double(mf.Yr(:, index));
     Ybg = Y - neuron.A*neuron.C(:,index);
-    [Ybg, Ybg_weights] = neuron.localBG(Ybg); % estimate local background
+    [Ybg, Ybg_weights] = neuron.localBG(Ybg, 1, neuron.options.gSiz); % estimate local background
     mf_bg.Yr(:, index) = Ybg;
   end
   mf_bg.Ysiz = Ysiz;
