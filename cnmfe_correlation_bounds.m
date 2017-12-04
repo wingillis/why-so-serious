@@ -1,5 +1,6 @@
 function cnmfe_correlation_bounds(fname)
 	%% use this function to calculate the detection thresholds interactively for cnmfe
+	% you can also run this from compute-corr-and-extract
 
 	% mf = matfile(fname, 'writable', true);
 	% mf.Ysiz = mf.sizY;

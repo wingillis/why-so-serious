@@ -1,3 +1,5 @@
 #!/bin/bash
 
+# transfer inscopix data from neurobio into orchestra servers
+
 slorc -l transfer -c "rsync -avr /files/Neurobio/DattaLab/win/inscopix/new-grin-data/ /n/groups/datta/win/inscopix/new-grin-data/"

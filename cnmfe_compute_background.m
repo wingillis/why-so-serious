@@ -1,4 +1,5 @@
 function cnmfe_compute_background(recfile, neuronfile)
+  %% compute the local background of the extracted neurons from cnmfe
   mf = matfile(recfile);
   mf_bg = matfile(sprintf('%s_background.mat', recfile(1:end-4)), 'writable', true);
   Ysiz = mf.Ysiz;
@@ -15,9 +16,10 @@ function cnmfe_compute_background(recfile, neuronfile)
     index = (i-1)*1000+1:i*1000;
     Y = double(mf.Yr(:, index));
     Ybg = Y - neuron.A*neuron.C(:,index);
-    [Ybg, Ybg_weights] = neuron.localBG(Ybg); % estimate local background
+    [Ybg, Ybg_weights] = neuron.localBG(Ybg, 1, neuron.options.gSiz); % estimate local background
     mf_bg.Yr(:, index) = Ybg;
   end
+  mf_bg.Ysiz = Ysiz;
 
   fprintf('Truncated recording by %d frames\n', Ysiz(3)-(chunks*1000));
 

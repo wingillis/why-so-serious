@@ -130,52 +130,30 @@ function cnmfe_extract(fname, spatial_thresh, temporal_thresh, min_corr, min_pnr
 	    'center_psf', center_psf);
 	neuron.Fs = Fs;
 
-	% CHANGED: from batch mode
-	%% distribute data and be ready to run source extraction
-	neuron.getReady(pars_envs);
-
-	%% initialize neurons from the video data within a selected temporal range
-	if choose_params
-	  % change parameters for optimized initialization
-	  [gSig, gSiz, ring_radius, min_corr, min_pnr] = neuron.set_parameters();
-	end
+	neuron.getReady_batch(pars_envs);
 
 	%% initialize neurons in batch mode
 	use_prev = false; % turn off using previous initializations
-	[center, Cn, PNR] = neuron.initComponents_parallel(K, frame_range, save_initialization, use_parallel, use_prev);
-
-	neuron.compactSpatial();
-
-	neuron.update_background_parallel(use_parallel);
-
-	neuron.merge_neurons_dist_corr(show_merge);
-	neuron.merge_high_corr(show_merge, merge_thr_spatial);
+	neuron.initComponents_batch(K, save_initialization, use_parallel, use_prev);
 
 	%% udpate spatial components for all batches
-	neuron.update_spatial_parallel(use_parallel);
+	neuron.update_spatial_batch(use_parallel);
 
-	for m=1:2
-	  % update temporal
-	  neuron.update_temporal_parallel(use_parallel);
-
-	  % delete bad neurons
-	  neuron.remove_false_positives();
-
-	  % merge neurons based on temporal correlation + distances
-	  neuron.merge_neurons_dist_corr(show_merge);
-	end
+	%% udpate temporal components for all bataches
+	neuron.update_temporal_batch(use_parallel);
 
 	%% update background
-	neuron.update_background_parallel(use_parallel);
+	neuron.update_background_batch(use_parallel);
 
-	%% delete neurons
+	%% get the correlation image and PNR image for all neurons
+	% neuron.correlation_pnr_batch();
+
+	%% concatenate temporal components
+	neuron.concatenate_temporal_batch();
 	neuron.remove_false_positives();
-
-	%% merge neurons
 	neuron.merge_neurons_dist_corr(show_merge);
 	neuron.merge_high_corr(show_merge, merge_thr_spatial);
 
-	%% get the correlation image and PNR image for all neurons
 	neuron.correlation_pnr_parallel();
 
 	%% save workspace
