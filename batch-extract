@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -c 6
-#SBATCH --mem=100G
+#SBATCH --mem=120G
 #SBATCH -p short
 #SBATCH -t 8:00:00
 #SBATCH --mail-type=END
