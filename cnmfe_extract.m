@@ -25,7 +25,7 @@ function cnmfe_extract(fname, spatial_thresh, temporal_thresh, min_corr, min_pnr
 	pars_envs = struct('memory_size_to_use', 40, ...   % GB, memory space you allow to use in MATLAB
 	    'memory_size_per_patch', 5, ...   % GB, space for loading data within one patch
 	    'patch_dims', [64, 64],...  %GB, patch size
-	    'batch_frames', 3000);           % number of frames per batch
+	    'batch_frames', 5000);           % number of frames per batch
 	  % -------------------------      SPATIAL      -------------------------  %
 	gSig = 4.5;  % pixel, gaussian width of a gaussian kernel for filtering the data. 0 means no filtering
 	gSiz = 15; % pixel, neuron diameter
@@ -43,7 +43,7 @@ function cnmfe_extract(fname, spatial_thresh, temporal_thresh, min_corr, min_pnr
 	    updateA_bSiz = neuron.options.dist;
 	end
 	spatial_constraints = struct('connected', true, 'circular', false);  % you can include following constraints: 'circular'
-	spatial_algorithm = 'hals';
+	spatial_algorithm = 'hals_thresh';
 
 	% -------------------------      TEMPORAL     -------------------------  %
 	Fs = 30;             % frame rate
