@@ -1,16 +1,16 @@
 function cnmfe_extract(fname, spatial_thresh, temporal_thresh, min_corr, min_pnr)
 	%% extract neurons from an inscopix recording using the new version of CNMF_E
 	if nargin < 2
-		spatial_thresh = 0.7;
+		spatial_thresh = 0.8;
 	end
 	if nargin < 3
-		temporal_thresh = 0.1;
+		temporal_thresh = 0.2;
 	end
 	if nargin < 4
-		min_corr = 0.75;     % minimum local correlation for a seeding pixel
+		min_corr = 0.8;     % minimum local correlation for a seeding pixel
 	end
 	if nargin < 5
-		min_pnr = 12;       % minimum peak-to-noise ratio for a seeding pixel
+		min_pnr = 15;       % minimum peak-to-noise ratio for a seeding pixel
 	end
 
 	mf = matfile(fname, 'writable', true);
@@ -60,7 +60,7 @@ function cnmfe_extract(fname, spatial_thresh, temporal_thresh, min_corr, min_pnr
 	detrend_method = 'spline';  % compute the local minimum as an estimation of trend.
 
 	% -------------------------     BACKGROUND    -------------------------  %
-	bg_model = 'ring';  % model of the background {'ring', 'svd'(default), 'nmf'}
+	bg_model = 'nmf';  % model of the background {'ring', 'svd'(default), 'nmf'}
 	nb = 1;             % number of background sources for each patch (only be used in SVD and NMF model)
 	bg_neuron_factor = 1.4;
 	ring_radius = round(bg_neuron_factor * gSiz);  % when the ring model used, it is the radius of the ring used in the background model.
