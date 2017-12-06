@@ -22,8 +22,8 @@ function cnmfe_extract(fname, spatial_thresh, temporal_thresh, min_corr, min_pnr
 
 	%% parameters
 	% -------------------------    COMPUTATION    -------------------------  %
-	pars_envs = struct('memory_size_to_use', 40, ...   % GB, memory space you allow to use in MATLAB
-	    'memory_size_per_patch', 5, ...   % GB, space for loading data within one patch
+	pars_envs = struct('memory_size_to_use', 70, ...   % GB, memory space you allow to use in MATLAB
+	    'memory_size_per_patch', 7, ...   % GB, space for loading data within one patch
 	    'patch_dims', [64, 64],...  %GB, patch size
 	    'batch_frames', 3000);           % number of frames per batch
 	  % -------------------------      SPATIAL      -------------------------  %
