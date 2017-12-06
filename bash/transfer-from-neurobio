@@ -2,4 +2,4 @@
 
 # transfer inscopix data from neurobio into orchestra servers
 
-slorc -l transfer -c "rsync -avr --no-owner --no-group /files/Neurobio/DattaLab/win/inscopix/new-grin-data/ /n/groups/datta/win/inscopix/new-grin-data/"
+slorc -l transfer -c "rsync -avr --no-owner --no-group /files/Neurobio/DattaLab/win/inscopix/new-grin-data/ /n/groups/datta/win/inscopix/new-grin-data/; chmod -R 755 /n/groups/datta/win/inscopix/new-grin-data/"
