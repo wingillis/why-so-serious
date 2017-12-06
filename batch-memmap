@@ -8,7 +8,7 @@
 
 # downsample the tif data and memmap it
 module unload matlab/2016b
-module load matlab/2017a
+module load matlab/2017b
 codepath="${HOME}/code"
 
 matlab -r "addpath(genpath('${codepath}')); memmap_file_sequence('.', '$1', 4);"
