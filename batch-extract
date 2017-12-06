@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH -c 6
-#SBATCH --mem=100G
+#SBATCH --mem=120G
 #SBATCH -p short
-#SBATCH -t 8:00:00
+#SBATCH -t 12:00:00
 #SBATCH --mail-type=END
 #SBATCH --mail-user=wgillis@g.harvard.edu
 
@@ -16,7 +16,7 @@ module unload matlab/2016b
 module load matlab/2017b
 if [ -f cnmfe.config ]; then
   . ./cnmfe.config
-  matlab -r "addpath(genpath('${code}')); cnmfe_extract('$1', $spatial, $temporal, $min_corr, $min_pnr);"
+	matlab -r "addpath(genpath('${code}')); parpool('local', 6); cnmfe_extract('$1', $spatial, $temporal, $min_corr, $min_pnr);"
 else
-  matlab -r "addpath(genpath('${code}')); cnmfe_extract('$1');"
+	matlab -r "addpath(genpath('${code}')); parpool('local', 6); cnmfe_extract('$1');"
 fi
