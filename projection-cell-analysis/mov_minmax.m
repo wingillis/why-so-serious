@@ -12,5 +12,5 @@ function [mnx]=mov_minmax(mf)
   clear y1 y2
   mx = max(y, [], 3);
   mn = min(y, [], 3);
-  mnx = [prctile(mn(:), 5) prctile(mx(:), 95)];
+  mnx = [prctile(mn(:), 0.5) prctile(mx(:), 99.5)];
 end
