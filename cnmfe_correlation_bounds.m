@@ -2,8 +2,8 @@ function cnmfe_correlation_bounds(fname)
 	%% use this function to calculate the detection thresholds interactively for cnmfe
 	% you can also run this from compute-corr-and-extract
 
-	mf = matfile(fname, 'writable', true);
-	mf.Ysiz = mf.sizY;
+	% mf = matfile(fname, 'writable', true);
+	% mf.Ysiz = mf.sizY;
 
 	neuron = Sources2D();
 	nams = neuron.select_multiple_files({fname});  %if nam is [], then select data interactively
