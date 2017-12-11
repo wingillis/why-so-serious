@@ -27,8 +27,8 @@ function cnmfe_extract(fname, spatial_thresh, temporal_thresh, min_corr, min_pnr
 	    'patch_dims', [64, 64],...  %GB, patch size
 	    'batch_frames', 5000);           % number of frames per batch
 	  % -------------------------      SPATIAL      -------------------------  %
-	gSig = 4.5;  % pixel, gaussian width of a gaussian kernel for filtering the data. 0 means no filtering
-	gSiz = 15; % pixel, neuron diameter
+	gSig = 5;  % pixel, gaussian width of a gaussian kernel for filtering the data. 0 means no filtering
+	gSiz = 16; % pixel, neuron diameter
 	ssub = 1;  % spatial downsampling factor
 	with_dendrites = false;   % with dendrites or not
 	if with_dendrites
@@ -43,7 +43,7 @@ function cnmfe_extract(fname, spatial_thresh, temporal_thresh, min_corr, min_pnr
 	    updateA_bSiz = neuron.options.dist;
 	end
 	spatial_constraints = struct('connected', true, 'circular', false);  % you can include following constraints: 'circular'
-	spatial_algorithm = 'hals_thresh';
+	spatial_algorithm = 'hals';
 
 	% -------------------------      TEMPORAL     -------------------------  %
 	Fs = 30;             % frame rate
@@ -53,16 +53,17 @@ function cnmfe_extract(fname, spatial_thresh, temporal_thresh, min_corr, min_pnr
 	    'smin', -5, ...         % minimum spike size. When the value is negative, the actual threshold is abs(smin)*noise level
 	    'optimize_pars', true, ...  % optimize AR coefficients
 	    'optimize_b', true, ...% optimize the baseline);
-	    'max_tau', 100);    % maximum decay time (unit: frame);
+	    'max_tau', 120);    % maximum decay time (unit: frame);
 
-	nk = 3;             % detrending the slow fluctuation. usually 1 is fine (no detrending)
+	nk = 	3;             % detrending the slow fluctuation. usually 1 is fine (no detrending)
 	% when changed, try some integers smaller than total_frame/(Fs*30)
 	detrend_method = 'spline';  % compute the local minimum as an estimation of trend.
+	% detrend_method = 'local_min';  % compute the local minimum as an estimation of trend.
 
 	% -------------------------     BACKGROUND    -------------------------  %
-	bg_model = 'nmf';  % model of the background {'ring', 'svd'(default), 'nmf'}
-	nb = 1;             % number of background sources for each patch (only be used in SVD and NMF model)
-	bg_neuron_factor = 1.4;
+	bg_model = 'svd';  % model of the background {'ring', 'svd'(default), 'nmf'}
+	nb = 2;             % number of background sources for each patch (only be used in SVD and NMF model)
+	bg_neuron_factor = 2;
 	ring_radius = round(bg_neuron_factor * gSiz);  % when the ring model used, it is the radius of the ring used in the background model.
 	%otherwise, it's just the width of the overlapping area
 	num_neighbors = 50; % number of neighbors for each neuron
