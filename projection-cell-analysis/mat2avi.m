@@ -1,5 +1,5 @@
 function mat2avi(fpath, outputname)
-  % read in the whole movie and calculate some mins and maxes
+  %% transform a memmapped recording .mat file into a movie to watch
   [basename, ~, ~] = fileparts(fpath);
   % load(fpath);
   mf = matfile(fpath);
