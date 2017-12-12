@@ -11,7 +11,7 @@
 
 module unload matlab/2016b
 module load matlab/2017b
-cnmfepath="${HOME}/code/cnmfe-old"
+cnmfepath="${HOME}/code/cnmfe_old"
 grinpath="${HOME}/code/grin-analysis"
 echo "$(pwd)"
 echo "Running for $1"
