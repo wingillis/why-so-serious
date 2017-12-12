@@ -7,7 +7,7 @@ function mat2tiff(fname)
   frames = mf.sizY(1,3);
   imwrite(mf.Y(:,:,1), tifname);
   for i=2:frames
-    if mod(i, 500)
+    if mod(i, 500) == 0
       fprintf('Wrote %d frames out of %d\n', i, frames);
     end
     imwrite(mf.Y(:,:,i), tifname, 'WriteMode', 'append');
