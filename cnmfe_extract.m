@@ -155,6 +155,8 @@ function cnmfe_extract(fname, spatial_thresh, temporal_thresh, min_corr, min_pnr
 	%% udpate spatial components for all batches
 	neuron.update_spatial_parallel(use_parallel);
 
+	save(['spatial-neuron' fname], 'neuron');
+
 	for m=1:2
 	  % update temporal
 	  neuron.update_temporal_parallel(use_parallel);

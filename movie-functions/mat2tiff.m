@@ -2,6 +2,7 @@ function mat2tiff(fname)
   %% this function is mainly to use the downsampled recording files
   % that I've already made and pass them through the inscopix processing
   % pipeline
+  % it reads in the recording, then writes subsequent tif files with each frame
   prepend = 1;
   tifname = sprintf('%s-%03d.tif', fname(1:end-4), prepend);
   disp(sprintf('Output file name: %s', tifname));
