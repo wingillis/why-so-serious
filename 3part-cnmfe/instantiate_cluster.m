@@ -1,6 +1,6 @@
 function [c]=instantiate_cluster(options)
   % needed to run things through O2
-  if ~any(strcmp(parallel.clusterProfiles, 'o2 local R2016b'))
+  if ~any(strcmp(parallel.clusterProfiles, 'o2 local R2017b'))
     configCluster();
   end
   % condition for our queue - configure thru your config file
@@ -12,4 +12,6 @@ function [c]=instantiate_cluster(options)
   ClusterInfo.setUserDefinedOptions(options.cluster.user_defined_opts);
   % create the cluster object
   c = parcluster();
+  c.AdditionalProperties.WallTime = options.cluster.wall_time;
+  c.AdditionalProperties.QueueName = options.cluster.queue;
 end

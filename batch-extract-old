@@ -1,19 +1,18 @@
 #!/bin/bash
-#SBATCH -c 2
-#SBATCH -n 2
-#SBATCH --mem=130G
-#SBATCH -p short
-#SBATCH -t 12:00:00
+#SBATCH -n 1
+#SBATCH --mem=10G
+#SBATCH -p mpi
+#SBATCH -t 6:00:00
 #SBATCH --mail-type=END
 #SBATCH --mail-user=wgillis@g.harvard.edu
 
-# use cnmfe to extract neurons from a dataset
-# this assumes you are using the new version of CNMF_E
-# the config file is executable by the shell and can be added into the
-# extract function to customize threshold levels
+# this is the main batch script that runs cnmfe to extract neurons
+# for a 30 min recording w/~270x312px resolution, it takes about 2 hours
 
-cnmfe="${HOME}/code/cnmfe-old"
-grin="${HOME}/code/grin-analysis"
 module unload matlab/2016b
 module load matlab/2017b
-matlab -r "addpath(genpath('${cnmfe}')); addpath(genpath('${grin}')); cnmfe_extract('$1');"
+cnmfepath="${HOME}/code/cnmfe-old"
+grinpath="${HOME}/code/grin-analysis"
+echo "$(pwd)"
+echo "Running for $1"
+matlab -r "addpath(genpath('${grinpath}')); addpath(genpath('${cnmfepath}')); batch_cnmfe('$1');"
