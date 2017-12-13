@@ -9,8 +9,7 @@
 # this is the main batch script that runs cnmfe to extract neurons
 # for a 30 min recording w/~270x312px resolution, it takes about 2 hours
 
-module unload matlab/2016b
-module load matlab/2017b
+module load matlab/2016b
 cnmfepath="${HOME}/code/cnmfe_old"
 grinpath="${HOME}/code/grin-analysis"
 echo "$(pwd)"
