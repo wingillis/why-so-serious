@@ -17,15 +17,15 @@ function motion_correct(fname)
     [~, Greg] = dftregistration(template, fft2(tmp), 10);
     out.Y(:,:,i) = uint16(abs(ifft2(Greg)));
   end
-  if isfield(mf, 'Ysiz')
+  vinfo = who('-file', fname);
+  if ismember('Ysiz', vinfo)
   	out.Ysiz = mf.Ysiz;
 	end
-	if isfield(mf, 'sizY')
+	if ismember('sizY', vinfo)
 		out.sizY = mf.sizY;
 	end
-	if isfield(mf, 'nY')
+	if ismember('nY', vinfo)
 		out.nY = mf.nY;
 	end
-
 
 end % function
