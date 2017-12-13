@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# first motion correct the mat recording, then run old batch-extract on it
+
+cnmfepath="${HOME}/code/cnmfe_old"
+grinpath="${HOME}/code/grin-analysis"
+
+srun -n 1 -c 2 --mem=30G -p short -t 4:00:00 "module load matlab/2016b; matlab -r \"addpath(genpath('${grinpath}')); addpath(genpath('${cnmfepath}')); motion_correct('$1');\""
+
+motion="motion-corrected-${1}"
+sbatch /home/wg41/code/grin-analysis/batch-extract-old $motion
