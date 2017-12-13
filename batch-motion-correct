@@ -1,0 +1,6 @@
+#!/bin/bash
+
+module load matlab/2017b
+cnmfepath="${HOME}/code/cnmfe_old"
+grinpath="${HOME}/code/grin-analysis"
+matlab -r "addpath(genpath('${grinpath}')); addpath(genpath('${cnmfepath}')); motion_correct('$1'); exit"

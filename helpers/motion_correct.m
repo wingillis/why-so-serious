@@ -11,11 +11,21 @@ function motion_correct(fname)
   fprintf('Starting to motion correct...\n');
   for i=1:frames
     if mod(i, 500) == 0
-      fprintf('Completed %d/%d frames\r', i, frames);
+      fprintf('Completed %d/%d frames\n', i, frames);
     end
     tmp = mov(:,:,i);
     [~, Greg] = dftregistration(template, fft2(tmp), 10);
     out.Y(:,:,i) = uint16(abs(ifft2(Greg)));
   end
+  if isfield(mf, 'Ysiz')
+  	out.Ysiz = mf.Ysiz;
+	end
+	if isfield(mf, 'sizY')
+		out.sizY = mf.sizY;
+	end
+	if isfield(mf, 'nY')
+		out.nY = mf.nY;
+	end
+
 
 end % function
