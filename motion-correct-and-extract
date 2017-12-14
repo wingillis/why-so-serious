@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # first motion correct the mat recording, then run old batch-extract on it
+set -e
 
 set -e
 
