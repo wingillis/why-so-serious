@@ -11,6 +11,5 @@
 codepath="${HOME}/code"
 module unload matlab/2016b
 module load matlab/2017b
-matlab -r "addpath(genpath('${code}')); mat2avi('$1', 'movie'); exit;"
-ffmpeg -i movie.avi movie.mp4
-
+matlab -r "addpath(genpath('${code}')); mat2avi('$1', '$1'); exit;"
+ffmpeg -i "$1.avi" "$1.mp4"
