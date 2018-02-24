@@ -14,12 +14,13 @@ function part3_recomputing(fname, opt)
   % {sptial overlaps, temporal correlation of C, temporal correlation of S}
   merge_thr = [opt.cnmfe.spatial_corr, opt.cnmfe.temporal_corr, opt.cnmfe.spiketime_corr];  % choose thresholds for merging neurons (this will primarily merge neurons redundantly found by multiple patch processes, likely in the patch-overlaps)
   cnmfe_quick_merge;            % run neuron merges
+
+  [dir_nm, file_nm, file_type] = fileparts(fname);
+  raw = strrep(file_nm, '_processed', '');
   processed_path = fullfile(dir_nm, [raw '_results.mat']);
   save(processed_path, 'neuron', 'd1', 'd2', 'numFrame', 'options', 'Fs', '-v7.3')
 
   %% display neurons
-  [dir_nm, file_nm, file_type] = fileparts(fname);
-  raw = strrep(file_nm, '_processed', '');
   dir_neurons = fullfile(dir_nm, [raw '_neurons']);
   if exist(dir_neurons, 'dir') == 7
       temp = cd();

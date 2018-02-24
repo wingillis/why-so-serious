@@ -12,4 +12,5 @@ function [c]=instantiate_cluster(options)
   ClusterInfo.setUserDefinedOptions(options.cluster.user_defined_opts);
   % create the cluster object
   c = parcluster();
+  c.JobStorageLocation = '/n/groups/datta/win/matlab';
 end
