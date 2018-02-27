@@ -15,6 +15,7 @@ end
 
 %% extract neurons from an inscopix recording using the new version of CNMF_E
 
+p = pwd();
 mf = matfile(fname, 'writable', true);
 mf.Ysiz = mf.sizY;
 
@@ -24,10 +25,10 @@ nams = neuron.select_multiple_files({fname});  %if nam is [], then select data i
 
 %% parameters
 % -------------------------    COMPUTATION    -------------------------  %
-pars_envs = struct('memory_size_to_use', 25, ... % GB, memory space you allow to use in MATLAB
-	'memory_size_per_patch', 3.5, ... % GB, space for loading data within one patch
+pars_envs = struct('memory_size_to_use', 45, ... % GB, memory space you allow to use in MATLAB
+	'memory_size_per_patch', 5.5, ... % GB, space for loading data within one patch
 	'patch_dims', [128, 128],... % pixels, patch size
-	'batch_frames', 1000); % number of frames per batch
+	'batch_frames', 2500); % number of frames per batch
   % -------------------------      SPATIAL      -------------------------  %
 gSig = 3;  % pixel, gaussian width of a gaussian kernel for filtering the data. 0 means no filtering
 gSiz = 6; % pixel, neuron diameter
@@ -51,7 +52,7 @@ spatial_algorithm = 'hals';
 Fs = 30;             % frame rate
 tsub = 1;           % temporal downsampling factor
 deconv_options = struct('type', 'ar1', ... % model of the calcium traces. {'ar1', 'ar2'}
-	'method', 'foopsi', ... % method for running deconvolution {'foopsi', 'constrained', 'thresholded'}
+	'method', 'thresholded', ... % method for running deconvolution {'foopsi', 'constrained', 'thresholded'}
 	'smin', -5, ...         % minimum spike size. When the value is negative, the actual threshold is abs(smin)*noise level
 	'optimize_pars', true, ...  % optimize AR coefficients
 	'optimize_b', true, ...% optimize the baseline);
@@ -85,7 +86,7 @@ bd = 0;             % number of rows/columns to be ignored in the boundary (main
 frame_range = [];   % when [], uses all frames
 save_initialization = false;    % save the initialization procedure as a video.
 % set to false for debugging
-use_parallel = true;    % use parallel computation for parallel computing
+use_parallel = false;    % use parallel computation for parallel computing
 show_init = false;   % show initialization results
 choose_params = false; % manually choose parameters
 center_psf = true;  % set the value as true when the background fluctuation is large (usually 1p data)
@@ -154,8 +155,11 @@ end
 neuron.correlation_pnr_batch();
 neuron.concatenate_temporal_batch();
 
-save(['cnmfe-new-neuron-results-', fname], 'neuron');
-
-neuron.viewNeurons([], neuron.C_raw, 'neurons');
+save(['cnmfe-new-neuron-results-', fname], 'neuron', '-v7.3');
+impath = fullfile(p, 'neurons');
+if ~(exist(impath, 'dir') == 7)
+	mkdir(impath);
+end
+neuron.viewNeurons([], neuron.C_raw, impath);
 
 end % function
