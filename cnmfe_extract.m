@@ -25,13 +25,15 @@ nams = neuron.select_multiple_files({fname});  %if nam is [], then select data i
 
 %% parameters
 % -------------------------    COMPUTATION    -------------------------  %
-pars_envs = struct('memory_size_to_use', 45, ... % GB, memory space you allow to use in MATLAB
-	'memory_size_per_patch', 5.5, ... % GB, space for loading data within one patch
+pars_envs = struct('memory_size_to_use', 65, ... % GB, memory space you allow to use in MATLAB
+	'memory_size_per_patch', 20, ... % GB, space for loading data within one patch
 	'patch_dims', [128, 128],... % pixels, patch size
-	'batch_frames', 2500); % number of frames per batch
+	'batch_frames', 5000); % number of frames per batch
   % -------------------------      SPATIAL      -------------------------  %
-gSig = 3;  % pixel, gaussian width of a gaussian kernel for filtering the data. 0 means no filtering
-gSiz = 6; % pixel, neuron diameter
+% usually 1/4 the size of gSiz
+gSig = 2.5;  % pixel, gaussian width of a gaussian kernel for filtering the data. 0 means no filtering
+% slightly larger than a neuron
+gSiz = 10; % pixel, neuron diameter
 ssub = 1;  % spatial downsampling factor
 with_dendrites = false;   % with dendrites or not
 if with_dendrites
@@ -65,7 +67,8 @@ detrend_method = 'spline';  % compute the local minimum as an estimation of tren
 
 % -------------------------     BACKGROUND    -------------------------  %
 bg_model = 'ring';  % model of the background {'ring', 'svd'(default), 'nmf'}
-nb = 2;             % number of background sources for each patch (only be used in SVD and NMF model)
+nb = 1;             % number of background sources for each patch (only be used in SVD and NMF model)
+% factor is usually between 1-3: larger rings have higher computational cost
 bg_neuron_factor = 2;
 ring_radius = round(bg_neuron_factor * gSiz);  % when the ring model used, it is the radius of the ring used in the background model.
 %otherwise, it's just the width of the overlapping area
