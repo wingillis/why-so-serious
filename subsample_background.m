@@ -14,7 +14,7 @@ function subsample_background(fname)
 		start = (i-1)*numsamples + 1;
 		en = i*numsamples;
 		if en>sz(3)
-			e = sz(3);
+			en = sz(3);
 		end
 		y = mf.ybg(:,:,start:en);
 		fprintf('Iteration %d\n', i);
