@@ -2,7 +2,7 @@
 #SBATCH -c 1
 #SBATCH -n 1
 #SBATCH --mem=70G
-#SBATCH -p priority
+#SBATCH -p medium
 #SBATCH -t 2-0:00:00
 #SBATCH --mail-type=END
 #SBATCH --mail-user=wgillis@g.harvard.edu

@@ -1,0 +1,13 @@
+#!/bin/bash
+#SBATCH -c 1
+#SBATCH -n 1
+#SBATCH --mem=50G
+#SBATCH -p short
+#SBATCH -t 12:00:00
+#SBATCH --mail-type=END
+#SBATCH --mail-user=wgillis@g.harvard.edu
+
+module unload matlab/2016b
+module load matlab/2017b
+
+matlab -r "reconstruct_background('$1');"
