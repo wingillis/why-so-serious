@@ -9,7 +9,7 @@ sz = 0;
 for i=1:numel(neuron.batches)
 	fprintf('Running on batch %d\n', i);
 	bneuron = neuron.batches{i}.neuron;
-	ybg = bneuron.reconstruct_background([1 size(bneuron.C_prev, 2)]);
+	ybg = bneuron.reconstruct_background();
 	if i == 1
 		mf.ybg = ybg;
 	else
