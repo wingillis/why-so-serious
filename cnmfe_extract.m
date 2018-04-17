@@ -26,9 +26,9 @@ nams = neuron.select_multiple_files({fname});  %if nam is [], then select data i
 %% parameters
 % -------------------------    COMPUTATION    -------------------------  %
 pars_envs = struct('memory_size_to_use', 65, ... % GB, memory space you allow to use in MATLAB
-	'memory_size_per_patch', 20, ... % GB, space for loading data within one patch
+	'memory_size_per_patch', 30, ... % GB, space for loading data within one patch
 	'patch_dims', [128, 128],... % pixels, patch size
-	'batch_frames', 5000); % number of frames per batch
+	'batch_frames', 7000); % number of frames per batch
   % -------------------------      SPATIAL      -------------------------  %
 % usually 1/4 the size of gSiz
 gSig = 2.5;  % pixel, gaussian width of a gaussian kernel for filtering the data. 0 means no filtering
@@ -85,7 +85,7 @@ merge_thr_spatial = [spatial_thresh, temporal_thresh, -inf];  % merge components
 % -------------------------  INITIALIZATION   -------------------------  %
 K = [];             % maximum number of neurons per patch. when K=[], take as many as possible.
 min_pixel = gSig^2;      % minimum number of nonzero pixels for each neuron
-bd = 0;             % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
+bd = 5;             % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
 frame_range = [];   % when [], uses all frames
 save_initialization = false;    % save the initialization procedure as a video.
 % set to false for debugging
