@@ -29,3 +29,6 @@ function motion_correct(fname)
 	end
 
 end % function
+
+%% Requires code downloaded from here:
+% https://www.mathworks.com/matlabcentral/fileexchange/18401-efficient-subpixel-image-registration-by-cross-correlation
