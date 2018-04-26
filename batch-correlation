@@ -8,5 +8,6 @@
 #SBATCH --mail-user=wgillis@g.harvard.edu
 
 module load matlab/2017b
+codepath="${HOME}/code"
 
-matlab -singleCompThread -r "addpath(genpath('${code}')); compute_correlations('$1');"
+matlab -singleCompThread -r "addpath(genpath('${codepath}')); compute_correlations('$1');"
