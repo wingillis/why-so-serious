@@ -1,0 +1,12 @@
+#!/bin/bash
+#SBATCH -c 1
+#SBATCH -n 1
+#SBATCH --mem=20G
+#SBATCH -p short
+#SBATCH -t 2:00:00
+#SBATCH --mail-type=END
+#SBATCH --mail-user=wgillis@g.harvard.edu
+
+module load matlab/2017b
+
+matlab -singleCompThread -r "addpath(genpath('${code}')); compute_correlations('$1');"

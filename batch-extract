@@ -18,8 +18,8 @@ module load matlab/2017b
 if [ -f cnmfe.config ]; then
   . ./cnmfe.config
 	#matlab -singleCompThread -r "addpath(genpath('${code}')); parpool('local', 3); cnmfe_extract('$1', $spatial, $temporal, $min_corr, $min_pnr);"
-	matlab -singleCompThread -r "addpath(genpath('${code}')); cnmfe_extract('$1', $spatial, $temporal, $min_corr, $min_pnr);"
+	matlab -singleCompThread -r "addpath(genpath('${codepath}')); cnmfe_extract('$1', $spatial, $temporal, $min_corr, $min_pnr);"
 else
 	#matlab -singleCompThread -r "addpath(genpath('${code}')); parpool('local', 3); cnmfe_extract('$1');"
-	matlab -singleCompThread -r "addpath(genpath('${code}')); cnmfe_extract('$1');"
+	matlab -singleCompThread -r "addpath(genpath('${codepath}')); cnmfe_extract('$1');"
 fi
