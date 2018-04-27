@@ -2,14 +2,12 @@
 
 This repository is intended for people who want to run
 CNMF-E on orchestra (specifically right now o2). This code
-parallelizes much of cnmfe so that is can be distributed
-between multiple clusters.
-
-A ~30hr job can be run in 1.5-2hr.
+simplifies many of the cnmfe initialization steps so that it
+will effectively find cells and remove background signals.
 
 ## Instructions
 
-1. Please copy `default_cnmfe_params.config` into your home directory. This contains important information on how this code will process your data.
+1. Please copy `cnmfe.config` into the directory you'd like to extract. It contains important thresholds for detecting neurons and merging duplicate cells.
 2. Change the parameters in the **config file** to best suit your needs.
 3. Make sure that cnmfe is downloaded and saved on your orchestra account.
 4. make sure the code paths to cnmfe and this repo are properly pointed to in your **config file**.
