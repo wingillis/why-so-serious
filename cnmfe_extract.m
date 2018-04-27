@@ -76,10 +76,11 @@ num_neighbors = 50; % number of neighbors for each neuron
 
 % -------------------------      MERGING      -------------------------  %
 show_merge = false;  % if true, manually verify the merging step
-merge_thr = 0.65;     % thresholds for merging neurons; [spatial overlap ratio, temporal correlation of calcium traces, spike correlation]
 method_dist = 'max';   % method for computing neuron distances {'mean', 'max'}
 dmin = 5;       % minimum distances between two neurons. it is used together with merge_thr
 dmin_only = 2;  % merge neurons if their distances are smaller than dmin_only.
+
+% thresholds for merging neurons; [spatial overlap ratio, temporal correlation of calcium traces, spike correlation]
 merge_thr_spatial = [spatial_thresh, temporal_thresh, -inf];  % merge components with highly correlated spatial shapes (corr=0.8) and small temporal correlations (corr=0.1)
 
 % -------------------------  INITIALIZATION   -------------------------  %
@@ -96,6 +97,7 @@ center_psf = true;  % set the value as true when the background fluctuation is l
 % set the value as false when the background fluctuation is small (2p)
 
 % -------------------------  Residual   -------------------------  %
+% TODO: what are these from
 min_corr_res = 0.7;
 min_pnr_res = 6;
 seed_method_res = 'auto';  % method for initializing neurons from the residual
@@ -125,7 +127,7 @@ neuron.updateParams('gSig', gSig, ...       % -------- spatial --------
     'nb', nb, ...
     'ring_radius', ring_radius, ...
     'num_neighbors', num_neighbors, ...
-    'merge_thr', merge_thr, ...             % -------- merging ---------
+    'merge_thr', merge_thr_spatial, ...             % -------- merging ---------
     'dmin', dmin, ...
     'method_dist', method_dist, ...
     'min_corr', min_corr, ...               % ----- initialization -----
