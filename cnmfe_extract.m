@@ -86,7 +86,7 @@ merge_thr_spatial = [spatial_thresh, temporal_thresh, -inf];  % merge components
 % -------------------------  INITIALIZATION   -------------------------  %
 K = [];             % maximum number of neurons per patch. when K=[], take as many as possible.
 min_pixel = gSig^2;      % minimum number of nonzero pixels for each neuron
-bd = 5;             % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
+bd = 6;             % number of rows/columns to be ignored in the boundary (mainly for motion corrected data)
 frame_range = [];   % when [], uses all frames
 save_initialization = false;    % save the initialization procedure as a video.
 % set to false for debugging
